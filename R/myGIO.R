@@ -4,8 +4,15 @@
 #'
 #' @import htmlwidgets
 #'
+#' @param data a data frame
+#' @param width a string indicating pixels or percent width
+#' @param height a string indicating pixels height
+#' @param elementId a unique htmlwidgets identifier
+#'
+#' @return myGIO object
+#'
 #' @export
-myGIO <- function(message, width = NULL, height = NULL, elementId = NULL) {
+myGIO <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
