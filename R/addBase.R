@@ -17,4 +17,14 @@ addBase <- function(myGIO, base){
     type = "base",
     map = base
   )
+
+  ##put the layers together
+
+  if(length(myGIO$x$layers) > 0){
+    myGIO$x$layers <- c(myGIO$x$layers, list(layer))
+  } else {
+    myGIO$x$layers <- list(layer)
+  }
+
+  return(myGIO)
 }
