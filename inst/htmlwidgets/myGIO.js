@@ -19,7 +19,7 @@ HTMLWidgets.widget({
 			} else {
 				this.map = new myGIOmap({
 					element: document.getElementById(el.id),
-					plotLayers: x.layers,
+					mapLayers: x.layers,
 					options: x.options
 					});
 			}

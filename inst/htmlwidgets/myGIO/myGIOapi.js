@@ -80,3 +80,9 @@ myGIOmap.prototype.routeLayers = function(lys, chartElement){
 		
 	});
 }
+
+myGIOmap.prototype.addBase = function(ly, chartElement){
+	var that = this;
+	var map_var = ly.map;
+	console.log(map_var);
+}

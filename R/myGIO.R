@@ -12,11 +12,15 @@
 #' @return myGIO object
 #'
 #' @export
-myGIO <- function(data, width = NULL, height = NULL, elementId = NULL) {
-
+myGIO <- function(data = NULL, width = NULL, height = NULL, elementId = NULL) {
+  # preset options
+  options <- list(
+    margins = list(top = 20, bottom = 20, right = 20, left = 20)
+  )
   # forward options using x
   x = list(
-    message = message
+    data = data,
+    options = options
   )
 
   # create widget
