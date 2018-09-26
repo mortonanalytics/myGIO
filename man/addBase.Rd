@@ -4,10 +4,14 @@
 \alias{addBase}
 \title{addBase()}
 \usage{
-addBase(myGIO, base)
+addBase(myGIO, base, data = NULL, mapping = NULL)
 }
 \arguments{
 \item{base}{a string indicating the base map to be used}
+
+\item{data}{is a dataframe to be mapped tot he base layer}
+
+\item{mapping}{is a list object mapping the data to the map features; requires a data key and map key}
 
 \item{myGIo}{the widget object}
 }
