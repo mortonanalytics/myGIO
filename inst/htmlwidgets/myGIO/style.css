@@ -1,3 +1,9 @@
 path {
 	stroke: black;
 }
+
+.zip {
+    fill: none;
+    stroke: #CCC;
+    stroke-width: .5px;
+  }

@@ -3,6 +3,14 @@ dependencies:
   version: 4.10.0
   src: htmlwidgets/lib
   script: ./d3.min.js
+- name: topojson
+  version: 4.10.0
+  src: htmlwidgets/lib
+  script: ./topojson.js
+- name: usZip
+  version: 1.1.0
+  src: htmlwidgets/lib
+  script: ./us.js
 - name: myGIO
   version: 0.1.0
   src: htmlwidgets/myGIO

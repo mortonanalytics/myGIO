@@ -4,7 +4,7 @@
 \alias{myGIO}
 \title{<Add Title>}
 \usage{
-myGIO(data, width = NULL, height = NULL, elementId = NULL)
+myGIO(data = NULL, width = NULL, height = NULL, elementId = NULL)
 }
 \arguments{
 \item{data}{a data frame}
