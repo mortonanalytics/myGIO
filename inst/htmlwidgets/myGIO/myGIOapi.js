@@ -393,8 +393,8 @@ function zoomToBounds(boxes,that,m){
 		x = (xMin + xMax) / 2,
 		y = (yMin + yMax) / 2,
 		width = that.width - (m.right + m.left),
-		height = that.height - (m.top + m.bottom)
-		scale = Math.max(30, Math.min(6, 0.9 / Math.max(dx / width, dy / height))),
+		height = that.height - (m.top + m.bottom),
+		scale =  0.9 / Math.max(dx / width, dy / height),
 		translate = [width /2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
