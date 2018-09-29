@@ -16,3 +16,10 @@ test_object <- myGIO::myGIO() %>%
 testthat::test_that("add layer creates a list of one", {
   expect_output(str(test_object$x$layers), "List of 1")
 })
+
+test_object_2 <- test_object %>%
+  myGIO::addLayer(type = "polygon", mapping = list(map = "us"))
+
+testthat::test_that("add layer creates a list of two", {
+  expect_output(str(test_object$x$layers), "List of 2")
+})
