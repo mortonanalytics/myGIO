@@ -258,7 +258,9 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	
 }
 
-myGIOmap.prototype.update = function(chartElement){
+myGIOmap.prototype.update = function(x){
+	this.mapLayers = x.mapLayers;
+	this.options = x.options;
 	this.draw(this.element);
 }
 
