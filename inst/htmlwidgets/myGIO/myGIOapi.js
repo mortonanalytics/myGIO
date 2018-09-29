@@ -65,8 +65,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		.scale(1);
 		
 	this.chart
-		.call(this.zoom)
-		.call(this.zoom.transform, initialTransform);
+		.call(this.zoom);
 		
 	function zoomed() {
 	  //that.chart.style("stroke-width", 1 / d3.event.transform.k + "px");
@@ -394,7 +393,7 @@ function zoomToBounds(boxes,that,m){
 		y = (yMin + yMax) / 2,
 		width = that.width - (m.right + m.left),
 		height = that.height - (m.top + m.bottom),
-		scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx / width, dy / height))),
+		scale = Math.max(2, Math.min(20, 0.9 / Math.max(dx / width, dy / height))),
 		translate = [width / 2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
@@ -402,7 +401,7 @@ function zoomToBounds(boxes,that,m){
 		.scale(scale);
 	
 	that.chart.transition()
-		.duration(750)
+		.duration(1000)
 		.call(that.zoom.transform, transform);
 }
 	
