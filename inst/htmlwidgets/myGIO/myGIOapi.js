@@ -364,7 +364,7 @@ function boundingExtent(features,path) {
     }
 
 function zoomToBounds(boxes,that,m){
-	
+	console.log(boxes);
 	//calculate ending coordinates
 	boxes.forEach(function(d){
 		return d.x2 = d.x + d.width;
@@ -394,7 +394,7 @@ function zoomToBounds(boxes,that,m){
 		y = (yMin + yMax) / 2,
 		width = that.width - (m.right + m.left),
 		height = that.height - (m.top + m.bottom),
-		scale = Math.max(1, Math.min(15, 0.9 / Math.max(dx / width, dy / height))),
+		scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx / width, dy / height))),
 		translate = [width / 2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
