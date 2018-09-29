@@ -254,7 +254,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	    .attr("d", path); 
 	
 	var bboxes = boundingExtent(us, path);
-	zoomToBounds(bboxes,that,m);
+	//zoomToBounds(bboxes,that,m);
 	
 }
 
@@ -384,7 +384,7 @@ function zoomToBounds(boxes,that,m){
 		y = (yMin + yMax) / 2,
 		width = that.width - (m.right + m.left),
 		height = that.height - (m.top + m.bottom)
-		scale = Math.max(5, Math.min(3, 0.9 / Math.max(dx / width, dy / height))),
+		scale = Math.max(2, Math.min(3, 0.9 / Math.max(dx / width, dy / height))),
 		translate = [width /2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
