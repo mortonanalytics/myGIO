@@ -15,7 +15,7 @@
 myGIO <- function(data = NULL, width = NULL, height = NULL, elementId = NULL) {
   # preset options
   options <- list(
-    margins = list(top = 20, bottom = 20, right = 20, left = 20)
+    margins = list(top = 0, bottom = 0, right = 0, left = 0)
   )
   # forward options using x
   x = list(
