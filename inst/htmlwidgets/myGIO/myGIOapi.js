@@ -258,6 +258,14 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	
 }
 
+myGIOmap.prototype.update = function(chartElement){
+	this.draw(this.element);
+}
+
+myGIOmap.prototype.resize = function(chartElement){
+	this.draw(this.element);
+}
+
 function getProjection(name){
 	
 	var projections = {
