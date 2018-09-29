@@ -254,7 +254,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	    .attr("d", path); 
 	
 	var bboxes = boundingExtent(us, path);
-	//zoomToBounds(bboxes,that,m);
+	zoomToBounds(bboxes,that,m);
 	
 }
 
