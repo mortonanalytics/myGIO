@@ -64,7 +64,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		.translate(0,0)
 		.scale(1);
 		
-	this.chart
+	this.svg
 		.call(this.zoom);
 		
 	function zoomed() {
@@ -400,7 +400,7 @@ function zoomToBounds(boxes,that,m){
 		.translate(translate[0], translate[1])
 		.scale(scale);
 	
-	that.chart.transition()
+	that.svg.transition()
 		.duration(1000)
 		.call(that.zoom.transform, transform);
 }
