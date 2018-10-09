@@ -4,7 +4,7 @@
 \alias{addLayer}
 \title{addLayer()}
 \usage{
-addLayer(myGIO, type, data = NULL, mapping = NULL)
+addLayer(myGIO, type, data = NULL, mapping = NULL, options = NULL)
 }
 \arguments{
 \item{type}{a string indicating the layer to be added ("world", "us")}

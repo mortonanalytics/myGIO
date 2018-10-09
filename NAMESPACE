@@ -2,6 +2,7 @@
 
 export(addBase)
 export(addLayer)
+export(assignPolygonFill)
 export(myGIO)
 export(myGIOOutput)
 export(renderMyGIO)
