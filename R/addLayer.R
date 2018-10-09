@@ -9,7 +9,7 @@
 #'
 #' @return myGIO object with base layer attached
 #' @export
-addLayer <- function(myGIO, type, data = NULL, mapping = NULL){
+addLayer <- function(myGIO, type, data = NULL, mapping = NULL, options = NULL){
 
   #assert layer type
   stopifnot(is.character(type))
@@ -18,7 +18,8 @@ addLayer <- function(myGIO, type, data = NULL, mapping = NULL){
   layer <- list(
     type = type,
     data = data,
-    mapping = mapping
+    mapping = mapping,
+    options = options
   )
 
   ##put the layers together
