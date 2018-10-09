@@ -8,7 +8,7 @@ df <- data.frame(zipcode = c("59801", "59802", "59803", "59804","59805", "59606"
 widget_list <- myGIO::myGIO()
 
 testthat::test_that("add layer creates a list of eight", {
-  expect_output(str(widget_list), "List of 8")
+  testthat::expect_output(str(widget_list), "List of 8")
 })
 
 test_object <- myGIO::myGIO() %>%
@@ -19,17 +19,17 @@ test_object <- myGIO::myGIO() %>%
                                 mapKey = "zip"))
 
 testthat::test_that("add layer creates a list of one", {
-  expect_output(str(test_object$x$layers), "List of 1")
+  testthat::expect_output(str(test_object$x$layers), "List of 1")
 })
 
 test_object_2 <- test_object %>%
   myGIO::addLayer(type = "polygon", mapping = list(map = "us"))
 
 testthat::test_that("add layer creates a list of two", {
-  expect_output(str(test_object_2$x$layers), "List of 2")
+  testthat::expect_output(str(test_object_2$x$layers), "List of 2")
 })
 
 testthat::test_that("add layer creates a list of two", {
-  expect_output(str(myGIO::assignPolygonFill(ids = "MT")), "List of 2")
+  testthat::expect_output(str(myGIO::assignPolygonFill(ids = "MT", propertyId = "NAME")), "List of 3")
 })
 
