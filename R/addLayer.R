@@ -4,6 +4,7 @@
 #'
 #' @param myGIo the widget object
 #' @param type a string indicating the layer to be added ("world", "us")
+#' @param label a string unique to the layer for the chart
 #' @param data is a dataframe to be mapped tot he base layer
 #' @param mapping is a list object mapping the data to the map features; requires a data key and map key
 #' @param options is a vector of objects to set and assign layer behaviors

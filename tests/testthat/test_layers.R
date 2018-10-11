@@ -23,7 +23,7 @@ testthat::test_that("add layer creates a list of one", {
 })
 
 test_object_2 <- test_object %>%
-  myGIO::addLayer(type = "polygon", mapping = list(map = "us"))
+  myGIO::addLayer(type = "polygon", label = "state", mapping = list(map = "us"))
 
 testthat::test_that("add layer creates a list of two", {
   testthat::expect_output(str(test_object_2$x$layers), "List of 2")
@@ -33,6 +33,6 @@ testthat::test_that("assignPolygonFill creates a list of three", {
   testthat::expect_output(str(myGIO::assignPolygonFill(ids = "MT", propertyId = "NAME")), "List of 3")
 })
 
-testthat::test_that("setPolygonZoom creates a list of two", {
-  testthat::expect_output(str(myGIO::setPolygonZoom()), "List of 2")
+testthat::test_that("setPolygonZoom creates a list of three", {
+  testthat::expect_output(str(myGIO::setPolygonZoom()), "List of 3")
 })
