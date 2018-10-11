@@ -147,9 +147,13 @@ myGIOmap.prototype.processScales = function(lys, options){
 	
 	var colorExtent = d3.extent(data, function(d) { return d[dataValue]; });
 	var colorMin = colorExtent[0] >0 ? 0 : colorExtent[0];
+	
+	var colorMean = d3.mean(data, function(d) { return d[dataValue]; });
+	
+	
 	this.colorScale = d3.scaleLinear()
-		.range(["white", "steelblue"])
-		.domain([colorMin, colorExtent[1]]);
+		.range(["white", "#FFBB00", "#FF3D00"])
+		.domain([colorMin, colorMean, colorExtent[1]]);
 }
 
 myGIOmap.prototype.routeLayers = function(lys, chartElement){
