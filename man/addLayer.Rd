@@ -10,6 +10,8 @@ addLayer(myGIO, type, label, data = NULL, mapping = NULL,
 \arguments{
 \item{type}{a string indicating the layer to be added ("world", "us")}
 
+\item{label}{a string unique to the layer for the chart}
+
 \item{data}{is a dataframe to be mapped tot he base layer}
 
 \item{mapping}{is a list object mapping the data to the map features; requires a data key and map key}
