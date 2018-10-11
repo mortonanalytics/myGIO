@@ -98,6 +98,9 @@ myGIOmap.prototype.setZoom = function(chartElement){
 	  //remove polygon fill below a certain opacity	
 	  if(1/(d3.event.transform.k) < 0.10){
 		  that.chart.selectAll('.states').style('fill', 'none');
+		  that.chart.selectAll('.countries').style('stroke-width', 0); 
+	  } else {
+		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px");   
 	  }
 	  
 	}
