@@ -385,6 +385,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var object = d3.select(this).data()[0];
 		var objectBox = path.bounds(object);
 		var objectData = object.properties.values[0];
+		var sidebar = d3.select('#sidebarCollapsed');
+		console.log(sidebar);
 		var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
 		var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
