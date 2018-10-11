@@ -113,10 +113,10 @@ myGIOmap.prototype.processScales = function(lys, options){
 	var dataValue = lys[0].mapping.dataValue;
 	
 	var colorExtent = d3.extent(data, function(d) { return d[dataValue]; });
-		
+	var colorMin = colorExtent[0] >0 ? 0 : colorExtent[0];
 	this.colorScale = d3.scaleLinear()
 		.range(["white", "steelblue"])
-		.domain(colorExtent);
+		.domain([colorMin, colorExtent[1]]);
 }
 
 myGIOmap.prototype.routeLayers = function(lys, chartElement){
@@ -330,6 +330,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	polygons
 		.merge(newPolygons)
 		.style('fill', function(d){ 
+		
 			var values = d.properties.values[0];
 			var colorValue = values[ly.mapping.dataValue];
 			return that.colorScale(colorValue); 
@@ -424,7 +425,7 @@ function filterPolygons(mapObject,ly){
 	var filterArray = data.map(function(e){ return e[dataKey];})
 	var dataValue = ly.mapping.dataValue;
 	var mapKey = ly.mapping.mapKey;
-		
+	
 	//filter to polygons with data
 	var newMapObject = topojson.feature(mapObject, mapObject.objects.zip_codes_for_the_usa).features.filter(function(d){	
 		var zip = d.properties.zip;
