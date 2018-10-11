@@ -444,8 +444,7 @@ function attachZipData(mapObject, ly){
 	var dataValue = ly.mapping.dataValue;
 	var mapKey = ly.mapping.mapKey;
 
-	//attach data to mapObject
-	
+	//attach data to mapObject	
 	mapObject.forEach(function(d){
 		
 		var thisZip = d.properties.zip;
