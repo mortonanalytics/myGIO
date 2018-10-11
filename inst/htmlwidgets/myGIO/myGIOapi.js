@@ -312,7 +312,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	    .attr("data-state", function(d) {return d.properties.state; })
 	    .attr("data-name", function(d) {return d.properties.name; })
 		.style('fill', 'none')
-		.style('stroke', 'none')
+		.style('stroke', 'lightgray')
 		.style('stroke-width', '0.01px')
 		.on('mouseover', hoverTip)
 		.on('mousemove', hoverTip)
@@ -349,8 +349,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 		
 		that.tooltip
-              .style("left", (d3.mouse(this)[0]) + 'px')
-			  .style("top", (d3.mouse(this)[1]) + 'px')
+              .style("left", (d3.event.pageX + 34) + 'px')
+			  .style("top", (d3.event.pageY + 12) + 'px')
               .style("display", "inline-block")
               .html(function() {
 				  if(ly.mapping.toolTip){
