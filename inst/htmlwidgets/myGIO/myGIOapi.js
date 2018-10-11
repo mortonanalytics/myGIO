@@ -349,8 +349,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 		
 		that.tooltip
-              .style("left", (d3.event.pageX + 34) + 'px')
-			  .style("top", (d3.event.pageY + 12) + 'px')
+              .style("left",  '0px')
+			  .style("top",  '0px')
               .style("display", "inline-block")
               .html(function() {
 				  if(ly.mapping.toolTip){
