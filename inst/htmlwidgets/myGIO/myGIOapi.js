@@ -279,6 +279,11 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	var that = this;
 	var m = this.margin;
 	
+	//formats
+	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
+	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
+	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+	
 	//filter features to those with data
 	//attach data using keys
 	var us = attachZipData(filterPolygons(window.us[0], ly),ly);
@@ -318,19 +323,18 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		.on('mousemove', hoverTip)
 		.on('mouseout', hoverTipHide)
 		.on('click', function(d){
-			console.log(d3.select(this).data()[0]);
 			if(ly.options.setPolygonZoom.behavior){
 				if(ly.options.setPolygonZoom.behavior == 'click'){
 					var current_polygon = d3.select(this).data()[0];
 					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale);
 				}
 			}
-		});;
+		})
+		;
 	
 	polygons
 		.merge(newPolygons)
-		.style('fill', function(d){ 
-		
+		.style('fill', function(d){ 	
 			var values = d.properties.values[0];
 			var colorValue = values[ly.mapping.dataValue];
 			return that.colorScale(colorValue); 
@@ -349,8 +353,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 		
 		that.tooltip
-              .style("left",  '0px')
-			  .style("top",  '0px')
+              .style("left", (d3.event.clientX + 20) + 'px')
+			  .style("top",  (d3.event.clientY - 20) + 'px')
               .style("display", "inline-block")
               .html(function() {
 				  if(ly.mapping.toolTip){
