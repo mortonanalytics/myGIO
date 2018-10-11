@@ -377,7 +377,7 @@ myGIOmap.prototype.update = function(x){
 }
 
 myGIOmap.prototype.resize = function(chartElement){
-	this.draw(this.element);
+	
 }
 
 function getProjection(name){
