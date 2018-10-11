@@ -42,6 +42,7 @@ myGIOmap.prototype.draw = function(chartElement){
 	this.setZoom(chartElement);
 	this.processScales(this.mapLayers, this.options);
 	this.routeLayers(this.mapLayers, chartElement);
+	
 }
 
 myGIOmap.prototype.setClipPath = function(chartElement){
@@ -71,10 +72,10 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		.call(this.zoom);
 		
 	function zoomed() {
-	  //that.chart.style("stroke-width", 1 / d3.event.transform.k + "px");
 	  that.chart.attr("transform", d3.event.transform);
-	  //set opacity of filled polygons
-	  d3.selectAll('.polygon')
+	  //set zoom behavior for states
+	  that.chart.selectAll('.states')
+		.style("stroke-width", 1 / d3.event.transform.k + "px")
 		.style('fill-opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
 			if(eventTransform > 0.15){
@@ -83,9 +84,20 @@ myGIOmap.prototype.setZoom = function(chartElement){
 				return eventTransform;
 			}
 		});
+		//set zoom behavior for countries
+		that.chart.selectAll('.countries')
+			.style("stroke-width", 1 / d3.event.transform.k + "px")
+			.style('fill-opacity', function(){
+				var eventTransform = 1/(d3.event.transform.k);
+				if(eventTransform > 0.15){
+					return 1;
+				} else {
+					return eventTransform;
+				}
+			});
 	  //remove polygon fill below a certain opacity	
 	  if(1/(d3.event.transform.k) < 0.10){
-		  d3.selectAll('.polygon').style('fill', 'none');
+		  that.chart.selectAll('.states').style('fill', 'none');
 	  }
 	  
 	}
@@ -191,7 +203,7 @@ myGIOmap.prototype.addPolygons = function(ly, chartElement){
 	
 	//filter features to those with data
 	//attach data using keys
-	var shapes = (ly.mapping.map == "us") ? us_states : world;
+	var shapes = (ly.mapping.map == "us") ? us_states : world_map;
 	
 	//set projection
 	var projection = getProjection(this.options.projection);
@@ -207,7 +219,7 @@ myGIOmap.prototype.addPolygons = function(ly, chartElement){
 	
 	//update pattern for polygons
 	var polygons = this.chart.append('g')
-		.attr('class', 'polygon')
+		.attr('class', '.' + ly.label)
 		.selectAll('path')
 		.data(shapes.features);
 		
@@ -216,22 +228,47 @@ myGIOmap.prototype.addPolygons = function(ly, chartElement){
 	var newPolygons = polygons.enter()
 		.append('path')
 		.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
-		.attr('class', 'polygon')
+		.attr('id', 'polygon-' + chartElement.id + '-' + ly.label)
+		.attr('class', ly.label)
 		.style('fill', function(d){ 
 			return useLayerColor == true ? layerColor(ly, d.properties[ly.options.assignPolygonFill.propertyId]) : 'none'; 
 			})
 		.style('stroke', 'none')
-		.style('stroke-width', '0.01px');
+		.style('stroke-width', '1px')
+		.on('click', function(d){
+			console.log(d3.select(this).data()[0]);
+			if(ly.options.setPolygonZoom.behavior){
+				if(ly.options.setPolygonZoom.behavior == 'click'){
+					var current_polygon = d3.select(this).data()[0];
+					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale);
+				}
+			}
+		});
 	
 	polygons
 		.merge(newPolygons)
 		.style('stroke', 'gray')
 	    .attr("d", path); 
 	
-	if(ly.options.setPolygonZoom.behavior){
+	if(ly.options.setPolygonZoom != null){
 		if(ly.options.setPolygonZoom.behavior == 'center'){
-			zoomToBounds(boundingExtent(shapes.features, path),that, m, ly.options.setPolygonZoom.zoomScale);
+			var filtered_shapes = shapes.features.filter(function(d){
+				if(ly.options.setPolygonZoom.ids){
+					var ids = ly.options.setPolygonZoom.ids;
+					var iso_a2 = d.properties.iso_a2;
+					return ids == iso_a2;
+				} else {
+					return d;
+				}
+				
+			});
+			zoomToBounds(boundingExtent(filtered_shapes, path),that, m, ly.options.setPolygonZoom.zoomScale);
 		}
+	}
+	
+	if(ly.mapping.map == "us"){
+		console.log("zoom to us");
+		zoomToBounds(boundingExtent(shapes.features, path),that, m, 1.5);
 	}
 }
 
@@ -276,7 +313,16 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		.style('stroke-width', '0.01px')
 		.on('mouseover', hoverTip)
 		.on('mousemove', hoverTip)
-		.on('mouseout', hoverTipHide);
+		.on('mouseout', hoverTipHide)
+		.on('click', function(d){
+			console.log(d3.select(this).data()[0]);
+			if(ly.options.setPolygonZoom.behavior){
+				if(ly.options.setPolygonZoom.behavior == 'click'){
+					var current_polygon = d3.select(this).data()[0];
+					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale);
+				}
+			}
+		});;
 	
 	polygons
 		.merge(newPolygons)
@@ -427,7 +473,7 @@ function boundingExtent(features,path) {
     }
 
 function zoomToBounds(boxes,that,m, zoomScale){
-	console.log(boxes);
+
 	//calculate ending coordinates
 	boxes.forEach(function(d){
 		return d.x2 = d.x + d.width;
@@ -458,7 +504,7 @@ function zoomToBounds(boxes,that,m, zoomScale){
 		width = that.width - (m.right + m.left),
 		height = that.height - (m.top + m.bottom),
 		scale = Math.max(1, Math.min(zoomScale, 0.9 / Math.max(dx / width, dy / height))),
-		translate = [width / zoomScale - scale * x, height / zoomScale - scale * y];
+		translate = [width / 2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
 		.translate(translate[0], translate[1])

@@ -6,10 +6,11 @@
 #' @param base a string indicating the base map to be used
 #' @param data is a dataframe to be mapped tot he base layer
 #' @param mapping is a list object mapping the data to the map features; requires a data key and map key
+#' @param options is a vector of objects to set and assign layer behaviors
 #'
 #' @return myGIO object with base layer attached
 #' @export
-addBase <- function(myGIO, base, data = NULL, mapping = NULL){
+addBase <- function(myGIO, base, data = NULL, mapping = NULL, options = NULL){
 
   #assert layer type
   stopifnot(is.character(base))
@@ -19,7 +20,8 @@ addBase <- function(myGIO, base, data = NULL, mapping = NULL){
     type = "base",
     map = base,
     data = data,
-    mapping = mapping
+    mapping = mapping,
+    options = options
   )
 
   ##put the layers together

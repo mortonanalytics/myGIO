@@ -4,7 +4,7 @@
 \alias{setPolygonZoom}
 \title{setPolytonZoom()}
 \usage{
-setPolygonZoom(behavior = "center", zoomScale = 2)
+setPolygonZoom(behavior = "center", ids = NULL, zoomScale = 2)
 }
 \arguments{
 \item{behavior}{a string indicating the desired zoom behavior for the layer: "center"}

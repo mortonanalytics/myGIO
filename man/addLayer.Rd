@@ -4,7 +4,8 @@
 \alias{addLayer}
 \title{addLayer()}
 \usage{
-addLayer(myGIO, type, data = NULL, mapping = NULL, options = NULL)
+addLayer(myGIO, type, label, data = NULL, mapping = NULL,
+  options = NULL)
 }
 \arguments{
 \item{type}{a string indicating the layer to be added ("world", "us")}
@@ -12,6 +13,8 @@ addLayer(myGIO, type, data = NULL, mapping = NULL, options = NULL)
 \item{data}{is a dataframe to be mapped tot he base layer}
 
 \item{mapping}{is a list object mapping the data to the map features; requires a data key and map key}
+
+\item{options}{is a vector of objects to set and assign layer behaviors}
 
 \item{myGIo}{the widget object}
 }
