@@ -20,3 +20,9 @@
   opacity: 0.9;
   box-shadow: 0px 3px 9px rgba(0, 0, 0, .15);
 }
+.button {
+	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+	text-align: center;
+	background-color: #04A1FF;
+    color: white;
+}

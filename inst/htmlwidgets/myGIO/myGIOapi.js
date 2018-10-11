@@ -40,6 +40,7 @@ myGIOmap.prototype.draw = function(chartElement){
 	//initialize chart
 	this.setClipPath(chartElement);
 	this.setZoom(chartElement);
+	this.addZoomButtons(chartElement);
 	this.processScales(this.mapLayers, this.options);
 	this.routeLayers(this.mapLayers, chartElement);
 	
@@ -104,6 +105,38 @@ myGIOmap.prototype.setZoom = function(chartElement){
 	  }
 	  
 	}
+}
+
+myGIOmap.prototype.addZoomButtons = function(chartElement){
+	
+	var that = this;
+	
+	d3.select(this.element)
+		.selectAll('button')
+		.data(['-', '+'])
+		.enter()
+		.append('button')
+		.attr('class', 'button')
+		.attr('id', function(d) { return d })
+		.style('position', 'absolute')
+		.style('right', function(d,i){ return (i * 30) + 'px'})
+		.style('top', '30px')
+		.style('border-radius', '2px')
+		.style('width', '25px')
+		.html(function(d){
+			return d;
+		})
+		.on('click',function(d){
+			if(d == '+'){
+				that.zoom.scaleBy(that.svg.transition().duration(750), 1.3);
+				 
+			} else {
+				that.zoom.scaleBy(that.svg.transition().duration(750), 1 / 1.3);
+			}
+		});
+		
+	
+	
 }
 
 myGIOmap.prototype.processScales = function(lys, options){
