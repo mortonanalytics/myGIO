@@ -386,13 +386,13 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var objectBox = path.bounds(object);
 		var objectData = object.properties.values[0];
 		var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
-		console.log(sidebar);
+		var xMove = sidebar == true ? 20 : - 20;
 		var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
 		var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 		
 		that.tooltip
-              .style("left", (d3.event.clientX - sidebar == true ? 20 : - 20) + 'px')
+              .style("left", (d3.event.clientX - xMove) + 'px')
 			  .style("top",  (d3.event.clientY - 20) + 'px')
               .style("display", "inline-block")
               .html(function() {
