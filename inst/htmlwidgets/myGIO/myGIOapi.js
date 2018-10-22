@@ -131,11 +131,11 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 	var that = this;
 	
 	d3.select(this.element)
-		.selectAll('button')
+		.selectAll('.zoom')
 		.data(['-', '+'])
 		.enter()
 		.append('button')
-		.attr('class', 'button')
+		.attr('class', 'zoom')
 		.attr('id', function(d) { return d })
 		.style('position', 'absolute')
 		.style('right', function(d,i){ return (i * 30) + 'px'})
@@ -154,7 +154,24 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 			}
 		});
 		
-	
+	d3.select(this.element)
+		.selectAll('.reset')
+		.data(['Reset'])
+		.enter()
+		.append('button')
+		.attr('class', 'reset')
+		.attr('id', function(d) { return d })
+		.style('position', 'absolute')
+		.style('right', '0px')
+		.style('top', '60px')
+		.style('border-radius', '2px')
+		.style('width', '56px')
+		.html(function(d){
+			return d;
+		})
+		.on('click', function(){
+			that.draw(that.element);
+		});
 	
 }
 
