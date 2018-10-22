@@ -435,6 +435,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 				return path.centroid(d)[1];
 			})
 			.attr("text-anchor", "middle")
+			.style('opacity', 0)
 			.attr("font-size", "15px")
 			.style('fill', 'gray')
 			.attr('dy', 0)
@@ -446,6 +447,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 			.attr("text-anchor", "middle")
 			.attr("font-size", "15px")
 			.style('fill', 'gray')
+			.style('opacity', 0)
 			.attr("x", function(d) {
 				return path.centroid(d)[0];
 			})
