@@ -104,8 +104,19 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px");   
 	  }
 	  
-	  that.chart.selectAll('.counties-text')
-		.style('opacity', function(){
+	  // that.chart.selectAll('.counties-text')
+		// .style('opacity', function(){
+			// var eventTransform = 1/(d3.event.transform.k);
+				// if(eventTransform > 0.02){
+					// return 0;
+				// } else {
+					// return 1;
+				// }
+		// });
+		
+		that.chart.selectAll('.zip-text')
+			.attr("font-size", 15 / d3.event.transform.k + "px")
+			.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
 				if(eventTransform > 0.02){
 					return 0;
@@ -113,15 +124,20 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					return 1;
 				}
 		});
-		
-		that.chart.selectAll('.zip-text')
-			.attr("font-size", 15 / d3.event.transform.k + "px");
 			//.style('text-shadow',  "0px 0px 3px white");
 		
 		that.chart.selectAll('.zip-text2')
 			.attr("font-size", 15 / d3.event.transform.k + "px")
 			//.style('text-shadow',  "0px 0px 3px white")
-			.attr("dy", 15 / d3.event.transform.k);
+			.attr("dy", 15 / d3.event.transform.k)
+			.style('opacity', function(){
+			var eventTransform = 1/(d3.event.transform.k);
+				if(eventTransform > 0.02){
+					return 0;
+				} else {
+					return 1;
+				}
+		});
 	  
 	}
 }
@@ -420,7 +436,6 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		.data(us)
 		.enter().append("svg:text")
 		.style('pointer-events', 'none')
-		.style('opacity', 0)
         .attr("x", function(d) {
             return path.centroid(d)[0];
         })
@@ -436,6 +451,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 				return path.centroid(d)[1];
 			})
 			.attr("text-anchor", "middle")
+			.style('opacity', 0)
 			.attr("font-size", "15px")
 			.style('fill', 'gray')
 			.attr('dy', 0)
@@ -447,6 +463,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 			.attr("text-anchor", "middle")
 			.attr("font-size", "15px")
 			.style('fill', 'gray')
+			.style('opacity', 0)
 			.attr("x", function(d) {
 				return path.centroid(d)[0];
 			})
