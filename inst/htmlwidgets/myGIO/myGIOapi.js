@@ -392,9 +392,9 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		.style('fill', 'none')
 		.style('stroke', 'gray')
 		.style('stroke-width', '0.02px')
-		.on('mouseover', hoverTip)
-		.on('mousemove', hoverTip)
-		.on('mouseout', hoverTipHide)
+		//.on('mouseover', hoverTip)
+		//.on('mousemove', hoverTip)
+		//.on('mouseout', hoverTipHide)
 		.on('click', function(d){
 			if(ly.options.setPolygonZoom.behavior){
 				if(ly.options.setPolygonZoom.behavior == 'click'){
@@ -469,7 +469,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		var objectBox = path.bounds(object);
 		var objectData = object.properties.values[0];
 		if(HTMLWidgets.shinyMode)var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
-		var xMove = sidebar == false ? 50 : 20;
+		var xMove = sidebar == false ? 50 : 0;
 		var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
 		var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
 		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
@@ -482,8 +482,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 				});
 		
 		that.tooltip
-              .style("left", (d3.event.clientX - xMove) + 'px')
-			  .style("top",  (d3.event.clientY - 20) + 'px')
+              .style("left", (d3.mouse(this)[0] - xMove) + 'px')
+			  .style("top",  (d3.mouse(this)[0] - 40) + 'px')
               .style("display", "inline-block")
               .html(function() {
 				  if(ly.mapping.toolTip){
