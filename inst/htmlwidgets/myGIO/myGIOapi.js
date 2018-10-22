@@ -107,7 +107,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 	  that.chart.selectAll('.counties-text')
 		.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
-				if(eventTransform > 0.05){
+				if(eventTransform > 0.03){
 					return 0;
 				} else {
 					return 1;
