@@ -76,10 +76,10 @@ myGIOmap.prototype.setZoom = function(chartElement){
 	  that.chart.attr("transform", d3.event.transform);
 	  //set zoom behavior for states
 	  that.chart.selectAll('.states')
-		.style("stroke-width", 1 / d3.event.transform.k + "px")
+		.style("stroke-width", 1.2 / d3.event.transform.k + "px")
 		.style('fill-opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
-			if(eventTransform > 0.55){
+			if(eventTransform > 0.65){
 				return 1;
 			} else {
 				return eventTransform;
@@ -90,19 +90,38 @@ myGIOmap.prototype.setZoom = function(chartElement){
 			.style("stroke-width", 1 / d3.event.transform.k + "px")
 			.style('fill-opacity', function(){
 				var eventTransform = 1/(d3.event.transform.k);
-				if(eventTransform > 0.55){
+				if(eventTransform > 0.65){
 					return 1;
 				} else {
 					return eventTransform;
 				}
 			});
 	  //remove polygon fill below a certain opacity	
-	  if(1/(d3.event.transform.k) < 0.50){
+	  if(1/(d3.event.transform.k) < 0.65){
 		  that.chart.selectAll('.states').style('fill', 'none');
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
 	  } else {
 		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px");   
 	  }
+	  
+	  that.chart.selectAll('.counties-text')
+		.style('opacity', function(){
+			var eventTransform = 1/(d3.event.transform.k);
+				if(eventTransform > 0.05){
+					return 0;
+				} else {
+					return 1;
+				}
+		});
+		
+		that.chart.selectAll('.zip-text')
+			.attr("font-size", 15 / d3.event.transform.k + "px")
+			.style('text-shadow',  "0px 0px 3px white");
+		
+		that.chart.selectAll('.zip-text2')
+			.attr("font-size", 15 / d3.event.transform.k + "px")
+			.style('text-shadow',  "0px 0px 3px white")
+			.attr("dy", 15 / d3.event.transform.k);
 	  
 	}
 }
@@ -274,7 +293,7 @@ myGIOmap.prototype.addPolygons = function(ly, chartElement){
 			return useLayerColor == true ? layerColor(ly, d.properties[ly.options.assignPolygonFill.propertyId]) : 'none'; 
 			})
 		.style('stroke', 'none')
-		.style('stroke-width', '1px')
+		.style('stroke-width', '1.2px')
 		.on('click', function(d){
 			console.log(d3.select(this).data()[0]);
 			if(ly.options.setPolygonZoom.behavior){
@@ -354,8 +373,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	    .attr("data-state", function(d) {return d.properties.state; })
 	    .attr("data-name", function(d) {return d.properties.name; })
 		.style('fill', 'none')
-		.style('stroke', 'lightgray')
-		.style('stroke-width', '0.01px')
+		.style('stroke', 'gray')
+		.style('stroke-width', '0.02px')
 		.on('mouseover', hoverTip)
 		.on('mousemove', hoverTip)
 		.on('mouseout', hoverTipHide)
@@ -377,6 +396,53 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 			return that.colorScale(colorValue); 
 			})
 	    .attr("d", path); 
+	
+	var polygonText = this.chart.append('g')
+		.attr('class', 'counties-text')
+		.selectAll('text')
+		.data(us)
+		.enter().append("svg:text")
+		.style('pointer-events', 'none')
+        .attr("x", function(d) {
+            return path.centroid(d)[0];
+        })
+        .attr("y", function(d) {
+            return path.centroid(d)[1];
+        })
+		.append('svg:tspan')
+			.attr('class', 'zip-text')
+			.attr("x", function(d) {
+            return path.centroid(d)[0];
+			})
+			.attr("y", function(d) {
+				return path.centroid(d)[1];
+			})
+			.attr("text-anchor", "middle")
+			.attr("font-size", "15px")
+			.style('fill', 'gray')
+			.attr('dy', 0)
+			.text(function(d) { 
+				return d.properties.zip + ": "; 
+				})
+		.append('svg:tspan')
+			.attr('class', 'zip-text2')
+			.attr("text-anchor", "middle")
+			.attr("font-size", "15px")
+			.style('fill', 'gray')
+			.attr("x", function(d) {
+				return path.centroid(d)[0];
+			})
+			.attr("y", function(d) {
+				return path.centroid(d)[1];
+			})
+			.attr('dy', 15)
+			.text(function(d) { 
+				console.log(colorValue);
+				var values = d.properties.values[0];
+				var colorValue = values[ly.mapping.dataValue];
+				return colorValue + " " + ly.mapping.dataValue; 
+			});
+	
 	
 	//var bboxes = boundingExtent(us, path);
 	//zoomToBounds(bboxes,that,m);
