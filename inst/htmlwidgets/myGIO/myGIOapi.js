@@ -115,12 +115,12 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		});
 		
 		that.chart.selectAll('.zip-text')
-			.attr("font-size", 15 / d3.event.transform.k + "px")
-			.style('text-shadow',  "0px 0px 3px white");
+			.attr("font-size", 15 / d3.event.transform.k + "px");
+			//.style('text-shadow',  "0px 0px 3px white");
 		
 		that.chart.selectAll('.zip-text2')
 			.attr("font-size", 15 / d3.event.transform.k + "px")
-			.style('text-shadow',  "0px 0px 3px white")
+			//.style('text-shadow',  "0px 0px 3px white")
 			.attr("dy", 15 / d3.event.transform.k);
 	  
 	}
