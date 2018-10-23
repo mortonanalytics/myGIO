@@ -218,7 +218,7 @@ myGIOmap.prototype.processScales = function(lys, options){
 	
 	
 	this.colorScale = d3.scaleLinear()
-		.range(["white", "#FFBB00", "#FF3D00"])
+		.range(["white", "#FFBB00", "#FF8C00"])
 		.domain([colorMin, colorMean, colorExtent[1]]);
 }
 
