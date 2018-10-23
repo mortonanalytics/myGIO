@@ -115,7 +115,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		// });
 		
 		that.chart.selectAll('.zip-text')
-			.attr("font-size", 15 / d3.event.transform.k + "px")
+			.attr("font-size", 12 / d3.event.transform.k + "px")
 			.attr("dy", -15 / d3.event.transform.k)
 			.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
