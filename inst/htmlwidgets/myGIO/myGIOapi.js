@@ -119,7 +119,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 			.attr("dy", -15 / d3.event.transform.k)
 			.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
-				if(eventTransform > 0.02){
+				if(eventTransform > 0.01){
 					return 0;
 				} else {
 					return 1;
@@ -133,7 +133,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 			//.attr("dy", 15 / d3.event.transform.k)
 			.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
-				if(eventTransform > 0.02){
+				if(eventTransform > 0.01){
 					return 0;
 				} else {
 					return 1;
@@ -146,7 +146,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 			.attr("dy", 15 / d3.event.transform.k)
 			.style('opacity', function(){
 			var eventTransform = 1/(d3.event.transform.k);
-				if(eventTransform > 0.02){
+				if(eventTransform > 0.01){
 					return 0;
 				} else {
 					return 1;
