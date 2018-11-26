@@ -769,9 +769,8 @@ function readGeoJSON(file_path,ly){
 			
 		});
 	});
-	
-	
-	
+		
+	console.log(objects);
 	return objects;
 }
 
