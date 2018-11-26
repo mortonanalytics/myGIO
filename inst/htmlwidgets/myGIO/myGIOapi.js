@@ -476,7 +476,8 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 			.attr('dy', -15)
 			.text(function(d) { 
 				if(!d.properties.values[0]) return
-				return "Zip: " + d.properties.zip; 
+				var check_zip = d.properties.zip ? d.properties.zip : d.zip;
+				return "Zip: " +  check_zip; 
 				})
 		.append('svg:tspan')
 			.attr('class', 'zip-text2')
@@ -739,32 +740,36 @@ function readGeoJSON(file_path,ly){
 	var dataKey = ly.mapping.dataKey;
 	var dataValue = ly.mapping.dataValue;
 	var mapKey = ly.mapping.mapKey;
-
-	d3.json(file_path, function(error, data){
-		data.forEach(function(d, i){
-			var new_data = {
-				key: i,
-				zip: d.zip,
-				properties: JSON.parse(d.properties),
-				geometry: JSON.parse(d.geometry),
-				type: "Feature"
-			};
-			new_data.geometry.type = new_data.geometry.type[0];
-			//new_data.geometry.coordinates = new_data.geometry.coordinates[0];
-			
-			var thisZip = d.zip;
 	
-			new_data.properties.values = data_ly.filter(function(e) { 
-				 
-				return e[dataKey] == thisZip; 
+	file_path.forEach(function(file_path){
+		d3.json(file_path, function(error, data){
+			data.forEach(function(d, i){
+				var new_data = {
+					key: i,
+					zip: d.zip,
+					properties: JSON.parse(d.properties),
+					geometry: JSON.parse(d.geometry),
+					type: "Feature"
+				};
+				new_data.geometry.type = new_data.geometry.type[0];
+				new_data.properties.GEOID10 = new_data.properties.GEOID10[0];
+				//new_data.geometry.coordinates = new_data.geometry.coordinates[0];
+				
+				var thisZip = d.zip;
+		
+				new_data.properties.values = data_ly.filter(function(e) { 
+					 
+					return e[dataKey] == thisZip; 
+				});
+				if(new_data.properties.values.length < 1) return ;
+				objects.push(new_data);
+				
+				
 			});
-			if(new_data.properties.values.length < 1) return ;
-			objects.push(new_data);
-			
 			
 		});
-		
 	});
+	
 	
 	
 	return objects;
