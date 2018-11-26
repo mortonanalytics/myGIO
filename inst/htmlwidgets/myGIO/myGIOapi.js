@@ -740,7 +740,7 @@ function readGeoJSON(file_path,ly){
 	var dataKey = ly.mapping.dataKey;
 	var dataValue = ly.mapping.dataValue;
 	var mapKey = ly.mapping.mapKey;
-	
+	console.log(file_path);
 	file_path.forEach(function(file_path){
 		d3.json(file_path, function(error, data){
 			data.forEach(function(d, i){
