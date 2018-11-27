@@ -393,7 +393,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 		
 		function read(file_path, callback){
 			var us = readGeoJSON(file_path, ly);
-			setTimeout(callback, 1000, us);
+			setTimeout(callback, 3000, us);
 		}
 		read(this.options.file_path, update)
 		
