@@ -390,8 +390,13 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	
 	//filter features to those with data
 	if(this.options.file_path){
-		var us = readGeoJSON(this.options.file_path, ly);
-		setTimeout(update, 500, us);
+		
+		function read(file_path, callback){
+			var us = readGeoJSON(file_path, ly);
+			setTimeout(callback, 1000, us);
+		}
+		read(this.options.file_path, update)
+		
 	} else {
 		var us = attachZipData(filterPolygons(window.us[0], ly),ly);
 		update(us);
