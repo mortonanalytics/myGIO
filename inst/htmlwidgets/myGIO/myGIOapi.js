@@ -100,7 +100,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 	  if(1/(d3.event.transform.k) < 0.65){
 		  that.chart.selectAll('.states').style('fill', 'none');
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
-		  that.chart.selectAll('.zip').style('opacity', 1); 
+		  that.chart.selectAll('.zip').style('opacity', 1).style('stroke-width', 1 / d3.event.transform.k + "px"); 
 	  } else {
 		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px");   
 	  }
