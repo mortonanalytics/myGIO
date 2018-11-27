@@ -101,9 +101,11 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		  that.chart.selectAll('.states').style('fill', 'none');
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
 		  that.chart.selectAll('.zip').style('opacity', 1).style('stroke-width', 1 / d3.event.transform.k + "px"); 
+	  } else if(1/(d3.event.transform.k) < 0.95){
+		that.chart.selectAll('.zip').style('stroke-width', 0);
 	  } else {
 		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px"); 
-		that.chart.selectAll('.zip').style('opacity', 0).style('stroke-width', 1 / d3.event.transform.k + "px")		
+		that.chart.selectAll('.zip').style('opacity', 0);
 	  }
 	  
 	  // that.chart.selectAll('.counties-text')
