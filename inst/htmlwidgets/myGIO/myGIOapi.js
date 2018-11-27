@@ -102,7 +102,8 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
 		  that.chart.selectAll('.zip').style('opacity', 1).style('stroke-width', 1 / d3.event.transform.k + "px"); 
 	  } else {
-		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px");   
+		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px"); 
+		that.chart.selectAll('.zip').style('opacity', 0).style('stroke-width', 1 / d3.event.transform.k + "px")		
 	  }
 	  
 	  // that.chart.selectAll('.counties-text')
