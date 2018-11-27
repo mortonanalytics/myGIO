@@ -391,13 +391,14 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 	//filter features to those with data
 	if(this.options.file_path){
 		var us = readGeoJSON(this.options.file_path, ly);
-		setTimeout(update, 100, us);
+		setTimeout(update, 500, us);
 	} else {
 		var us = attachZipData(filterPolygons(window.us[0], ly),ly);
 		update(us);
 	}
 	
 	function update(us){
+		console.log(us);
 		//set projection
 	var projection = getProjection(that.options.projection);
 	
@@ -448,7 +449,7 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 			return that.colorScale(colorValue); 
 			})
 	    .attr("d", path); 
-	
+	console.log(polygons);
 	var polygonText = that.chart.append('g')
 		.attr('class', 'counties-text')
 		.selectAll('text')
@@ -518,8 +519,6 @@ myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
 				return ly.mapping.secondValue + ": " + colorValue ; 
 			});
 	}
-	
-	
 	
 	//var bboxes = boundingExtent(us, path);
 	//zoomToBounds(bboxes,that,m);
