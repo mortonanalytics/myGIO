@@ -10,16 +10,17 @@
 #'
 #' @return myGIO object with base layer attached
 #' @export
-addBase <- function(myGIO, base, data = NULL, mapping = NULL, options = NULL){
+addBase <- function(myGIO, base, data = NULL, geoJson = NULL, mapping = NULL, options = NULL){
 
   #assert layer type
   stopifnot(is.character(base))
-  stopifnot(base %in% c("world", "us", "zipChloropleth"))
+  stopifnot(base %in% c("world", "us", "zipChloropleth", "userMap"))
 
   layer <- list(
     type = "base",
     map = base,
     data = data,
+    geoJson = geoJson,
     mapping = mapping,
     options = options
   )
