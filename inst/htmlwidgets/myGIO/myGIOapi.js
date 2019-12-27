@@ -634,12 +634,12 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 			if(ly.options.setPolygonZoom.behavior){
 				if(ly.options.setPolygonZoom.behavior == 'click'){
 					var current_polygon = d3.select(this).data()[0];
+					Shiny.onInputChange(chartElement.id + "_selectedPolygon", current_polygon);
 					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale * 4);
 				}
 			}
 		})
 		;
-	console.log(newPolygons);
 	
 	polygons
 		.merge(newPolygons)
@@ -650,9 +650,9 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 			return that.colorScale(colorValue); 
 			})
 	    .attr("d", path); 
+	console.log(boundingExtent( that.chart.selectAll('.zip').data(), path ))
+	zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
 
-	zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data()[0], path ), that, m, ly.options.setPolygonZoom.zoomScale);
-	console.log(polygons);
 	var polygonText = that.chart.append('g')
 		.attr('class', 'counties-text')
 		.selectAll('text')
@@ -898,17 +898,20 @@ function zoomToBounds(boxes,that,m, zoomScale){
 		return d.y2 = d.y + d.height;
 	});
 	
+	console.log(boxes);
+	
 	//calculate min/max for x and y
 	var xMin = d3.min(boxes, function(d){
 		return d.x;
 	});
-	var xMax = d3.min(boxes, function(d){
+	
+	var xMax = d3.max(boxes, function(d){
 		return d.x2;
 	});
 	var yMin = d3.min(boxes, function(d){
 		return d.y;
 	});
-	var yMax = d3.min(boxes, function(d){
+	var yMax = d3.max(boxes, function(d){
 		return d.y2;
 	});
 	
@@ -917,9 +920,9 @@ function zoomToBounds(boxes,that,m, zoomScale){
 		dy = yMax - yMin,
 		x = (xMin + xMax) / 2,
 		y = (yMin + yMax) / 2,
-		width = that.width - (m.right + m.left),
-		height = that.height - (m.top + m.bottom),
-		scale = Math.max(1, Math.min(zoomScale, 0.5 / Math.max(dx / width, dy / height))),
+		width = that.width,
+		height = that.height,
+		scale = Math.max(1, Math.min(zoomScale, 0.9 / Math.max(dx / width, dy / height))),
 		translate = [width / 2 - scale * x, height / 2 - scale * y];
 		
 	var transform = d3.zoomIdentity
