@@ -32,7 +32,8 @@ myGIOmap.prototype.draw = function(chartElement){
 	this.plot = this.svg.append('g')
 		.attr('transform','translate('+this.margin.left+','+this.margin.top+')');
 	
-	this.chart = this.plot.append('g');
+	this.chart = this.plot.append('g')
+		.attr('class', 'chartArea');
 	
 	//add tooltip div
 	this.tooltip = d3.select(this.element).append("div").attr("class", "toolTip");
@@ -598,7 +599,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 	update(data);
 	
 	function update(data){
-		console.log(data);
+		
 		//set projection
 	var projection = getProjection(that.options.projection);
 	
@@ -616,7 +617,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 		.attr('class', 'counties')
 		.selectAll('path')
 		.data(data);
-	console.log(polygons);
+	
 	polygons.exit().remove();
 
 	var newPolygons = polygons.enter()
@@ -627,9 +628,9 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 		.style('stroke', 'whitesmoke')
 		.style('stroke-width', '0.02px')
 		.style('opacity', 0)
-		//.on('mouseover', hoverTip)
-		//.on('mousemove', hoverTip)
-		//.on('mouseout', hoverTipHide)
+		.on('mouseover', hoverTip)
+		.on('mousemove', hoverTip)
+		.on('mouseout', hoverTipHide)
 		.on('click', function(d){
 			if(ly.options.setPolygonZoom.behavior){
 				if(ly.options.setPolygonZoom.behavior == 'click'){
@@ -650,7 +651,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 			return that.colorScale(colorValue); 
 			})
 	    .attr("d", path); 
-	console.log(boundingExtent( that.chart.selectAll('.zip').data(), path ))
+
 	zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
 
 	var polygonText = that.chart.append('g')
@@ -725,56 +726,71 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 				return ly.mapping.secondValue + ": " + colorValue ; 
 			});
 			*/
-	}
+			
+			function hoverTip(){
+				//TODO: get the mouse events translated to zoomed scale
+				var coord = d3.mouse(this);
+				var transform = d3.zoomTransform( that.svg.node() );
+				var coordNew = transform.invert(coord);
+				
+				var object = d3.select(this).data()[0];
+				var objectBox = path.bounds(object);
+				var objectData = object.properties.values;
+				if( HTMLWidgets.shinyMode & d3.select('#sidebarCollapsed') ){
+					var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
+				} else {
+					var sidebar = false;
+				}
+				var xMove = sidebar == false ? 50 : 0;
+				var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
+				var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
+				var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+				
+				d3.select(this).transition()
+					.style('fill', function(d){ 
+						var values = d.properties.values;
+						var colorValue = values[ly.mapping.dataValue];
+						return d3.rgb(that.colorScale(colorValue)).darker(1); 
+						});
+				
+				that.tooltip
+					  .style("left", 5 + 'px')
+					  .style("top", 5 + 'px')
+					  .style("display", "inline-block")
+					  .html(function() {
+						  if(ly.mapping.toolTip){
+							return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
+							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
+							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
+						  } else {
+							  console.log(objectData);
+							  console.log(objectData[ly.mapping.dataLabel]);
+							  console.log(ly.mapping.dataLabel);
+							  var labelValue = ly.mapping.dataLabel ? objectData[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+							  
+							return '' + labelValue + '<br>' + 
+							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
+						  }
+					  });
+			  
+			}
+
+			function hoverTipHide(){
+				d3.select(this).transition()
+					.style('fill', function(d){ 
+						var values = d.properties.values;
+						var colorValue = values[ly.mapping.dataValue];
+						return that.colorScale(colorValue); 
+					});
+				
+				that.tooltip.style("display", "none");
+				}
+			}
 	
 	//var bboxes = boundingExtent(us, path);
 	//zoomToBounds(bboxes,that,m);
 	
-	function hoverTip(){
-		var object = d3.select(this).data()[0];
-		var objectBox = path.bounds(object);
-		var objectData = object.properties.values[0];
-		if(HTMLWidgets.shinyMode)var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
-		var xMove = sidebar == false ? 50 : 0;
-		var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
-		var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
-		var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 		
-		d3.select(this).transition()
-			.style('fill', function(d){ 
-				var values = d.properties.values[0];
-				var colorValue = values[ly.mapping.dataValue];
-				return d3.rgb(that.colorScale(colorValue)).darker(1); 
-				});
-		
-		that.tooltip
-              .style("left", (d3.mouse(this)[0] - xMove) + 'px')
-			  .style("top",  (d3.mouse(this)[0] - 40) + 'px')
-              .style("display", "inline-block")
-              .html(function() {
-				  if(ly.mapping.toolTip){
-					return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
-					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
-					ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
-				  } else {
-					return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
-					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
-				  }
-			  });
-			  
-	}
-
-	function hoverTipHide(){
-		console.log(d3.select(this));
-		d3.select(this).transition()
-			.style('fill', function(d){ 
-				var values = d.properties.values[0];
-				var colorValue = values[ly.mapping.dataValue];
-				return that.colorScale(colorValue); 
-			});
-		
-		that.tooltip.style("display", "none");
-		}	
 	
 	
 }
@@ -897,8 +913,6 @@ function zoomToBounds(boxes,that,m, zoomScale){
 	boxes.forEach(function(d){
 		return d.y2 = d.y + d.height;
 	});
-	
-	console.log(boxes);
 	
 	//calculate min/max for x and y
 	var xMin = d3.min(boxes, function(d){
