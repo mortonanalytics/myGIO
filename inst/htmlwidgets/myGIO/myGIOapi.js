@@ -222,10 +222,17 @@ myGIOmap.prototype.processScales = function(lys, options){
 	
 	var colorMean = d3.mean(data, function(d) { return d[dataValue]; });
 	
-	
 	this.colorScale = d3.scaleLinear()
 		.range(["whitesmoke", "#FFBB00", "#FF8C00"])
 		.domain([colorMin, colorMean, colorExtent[1]]);
+	
+	this.legendScale = d3.scaleLinear()
+		.range([ 0, 250 ])
+		.domain([ colorMin, colorExtent[1] ]);
+	
+	this.legendAxis = d3.axisBottom()
+		.scale(this.legendScale)
+		.ticks(5);
 }
 
 myGIOmap.prototype.routeLayers = function(lys, chartElement){
@@ -667,6 +674,8 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
             return path.centroid(d)[1];
         });
 		
+		
+	that.updateLegend();
 
 		/*
 		.append('svg:tspan')
@@ -792,6 +801,58 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 	
 		
 	
+	
+}
+
+myGIOmap.prototype.updateLegend = function(){
+	var that = this;
+	
+	d3.selectAll('.legendBar').remove();
+	
+	var key = this.svg
+		.append('g')
+		.attr('class', 'legendObject');
+	
+	var legend = key.append('defs')
+		.append("svg:linearGradient")
+		.attr("id", "gradient")
+	    .attr("x1", "0%")
+	    .attr("y1", "100%")
+	    .attr("x2", "100%")
+	    .attr("y2", "100%")
+	    .attr("spreadMethod", "pad");
+		
+	legend.append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", "whitesmoke")
+      .attr("stop-opacity", 1);
+
+    legend.append("stop")
+      .attr("offset", "50%")
+      .attr("stop-color", "#FFBB00")
+      .attr("stop-opacity", 1);
+
+    legend.append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "#FF8C00")
+      .attr("stop-opacity", 1);
+	  
+	key.append('rect')
+		.attr("width", 250)
+        .attr("height", 30)
+        .style("fill", "url(#gradient)")
+        .attr("transform", "translate(5," + (this.height - 50) + ")");
+	 
+	key.append("g")
+      .attr("class", "legend axis")
+      .attr("transform", "translate(5," + (this.height - 20) + ")")
+      .call(this.legendAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("axis title");	
 	
 }
 
