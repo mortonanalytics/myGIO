@@ -762,6 +762,10 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 						var colorValue = values[ly.mapping.dataValue];
 						return d3.rgb(that.colorScale(colorValue)).darker(1); 
 						});
+						
+				console.log(d3.select(this).data());
+				
+				var mapObject = d3.select(this).data()[0].properties;
 				
 				that.tooltip
 					  .style("left", 5 + 'px')
@@ -773,7 +777,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
 						  } else {
-							  var labelValue = ly.mapping.dataLabel ? objectData[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+							  var labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
 							  
 							return '' + labelValue + '<br>' + 
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
