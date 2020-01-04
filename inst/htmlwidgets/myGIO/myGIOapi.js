@@ -841,16 +841,18 @@ myGIOmap.prototype.updateLegend = function(){
         .style("fill", "url(#gradient)")
         .attr("transform", "translate(5," + (this.height - 50) + ")");
 	 
-	/* key.append("g")
+	key.append("g")
       .attr("class", "legend axis")
       .attr("transform", "translate(5," + (this.height - 20) + ")")
-      .call(this.legendAxis)
+      .call(this.legendAxis);
+	  /*
       .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("axis title");	 */
+      .text("axis title");
+	  */
 	
 }
 
