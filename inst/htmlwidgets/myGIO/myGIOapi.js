@@ -190,11 +190,11 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 		});
 		
 	d3.select(this.element)
-		.selectAll('.reset')
+		.selectAll('.resetMap')
 		.data(['Reset'])
 		.enter()
 		.append('button')
-		.attr('class', 'reset')
+		.attr('class', 'resetMap')
 		.attr('id', function(d) { return d })
 		.style('position', 'absolute')
 		.style('right', '0px')
@@ -205,6 +205,8 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 			return d;
 		})
 		.on('click', function(){
+			var message = [];
+			Shiny.onInputChange(chartElement.id + "_selectedPolygon", message);
 			that.draw(that.element);
 		});
 	
@@ -218,7 +220,6 @@ myGIOmap.prototype.processScales = function(lys, options){
 	
 	var colorExtent = d3.extent(data, function(d) { return d[dataValue]; });
 	var colorMin = colorExtent[0] >0 ? 0 : colorExtent[0];
-	console.log(colorMin);
 	
 	var colorMean = d3.mean(data, function(d) { return d[dataValue]; });
 	
@@ -772,9 +773,6 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
 						  } else {
-							  console.log(objectData);
-							  console.log(objectData[ly.mapping.dataLabel]);
-							  console.log(ly.mapping.dataLabel);
 							  var labelValue = ly.mapping.dataLabel ? objectData[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
 							  
 							return '' + labelValue + '<br>' + 
@@ -843,7 +841,7 @@ myGIOmap.prototype.updateLegend = function(){
         .style("fill", "url(#gradient)")
         .attr("transform", "translate(5," + (this.height - 50) + ")");
 	 
-	key.append("g")
+	/* key.append("g")
       .attr("class", "legend axis")
       .attr("transform", "translate(5," + (this.height - 20) + ")")
       .call(this.legendAxis)
@@ -852,7 +850,7 @@ myGIOmap.prototype.updateLegend = function(){
       .attr("y", 0)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("axis title");	
+      .text("axis title");	 */
 	
 }
 
