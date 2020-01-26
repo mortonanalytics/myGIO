@@ -6,7 +6,7 @@ var myGIOmap = function(opts){
 	this.element = opts.element;
 	this.mapLayers = opts.mapLayers;
 	this.options = opts.options;
-	
+	console.log(opts);
 	//create the chart 
 	//widget calls the update function if chart already exists
 	this.draw(this.element);
