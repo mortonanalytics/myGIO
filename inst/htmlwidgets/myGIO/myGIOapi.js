@@ -772,7 +772,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 					  .style("top", 5 + 'px')
 					  .style("display", "inline-block")
 					  .html(function() {
-						  if(ly.mapping.toolTip){
+						  if(that.options.toolTipFormat){
 							return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
