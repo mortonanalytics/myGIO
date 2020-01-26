@@ -599,8 +599,8 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 
 	//formats
 	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
-	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
-	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+	var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
+	var toolTipFormat = d3.format(ly.toolTipFormat ? ly.options.toolTipFormat : "d");
 	
 	var data = ly.geoJson.features;
 	
@@ -752,9 +752,9 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 					var sidebar = false;
 				}
 				var xMove = sidebar == false ? 50 : 0;
-				var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
-				var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
-				var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+				var nameFormat = ly.options.nameFormat != "text" ? d3.format(ly.options.nameFormat ? ly.options.nameFormat : "d") : function(x) {return x;} ;
+				var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
+				var toolTipFormat = d3.format(ly.options.toolTipFormat ? ly.options.toolTipFormat : "d");
 				
 				d3.select(this).transition()
 					.style('fill', function(d){ 
@@ -772,7 +772,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 					  .style("top", 5 + 'px')
 					  .style("display", "inline-block")
 					  .html(function() {
-						  if(that.options.toolTipFormat){
+						  if(ly.options.toolTipFormat){
 							return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
