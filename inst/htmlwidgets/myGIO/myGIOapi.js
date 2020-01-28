@@ -843,11 +843,11 @@ myGIOmap.prototype.updateLegend = function(){
 		.attr("width", 250)
         .attr("height", 30)
         .style("fill", "url(#gradient)")
-        .attr("transform", "translate(5," + (this.height - 50) + ")");
+        .attr("transform", "translate(5,10)");
 	 
 	key.append("g")
       .attr("class", "legend axis")
-      .attr("transform", "translate(5," + (this.height - 20) + ")")
+      .attr("transform", "translate(5,40)")
       .call(this.legendAxis);
 	  /*
       .append("text")
