@@ -775,7 +775,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 						  if(ly.options.toolTipFormat){
 							  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
 							  
-							return ly.mapping.dataKey + ": " + nameFormat(labelValue) + '<br>' + 
+							return nameFormat(labelValue) + '<br>' + 
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
 						  } else {
