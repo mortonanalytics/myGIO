@@ -769,11 +769,13 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 				
 				that.tooltip
 					  .style("left", 5 + 'px')
-					  .style("top", 5 + 'px')
+					  .style("top", 60 + 'px')
 					  .style("display", "inline-block")
 					  .html(function() {
 						  if(ly.options.toolTipFormat){
-							return ly.mapping.dataKey + ": " + nameFormat(objectData[ly.mapping.dataKey]) + '<br>' + 
+							  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+							  
+							return ly.mapping.dataKey + ": " + nameFormat(labelValue) + '<br>' + 
 							ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
 							ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
 						  } else {
