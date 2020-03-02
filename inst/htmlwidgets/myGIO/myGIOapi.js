@@ -35,6 +35,8 @@ myGIOmap.prototype.draw = function(chartElement){
 	this.chart = this.plot.append('g')
 		.attr('class', 'chartArea');
 	
+	this.addButtons();
+	
 	//add tooltip div
 	this.tooltip = d3.select(this.element).append("div").attr("class", "toolTip");
 	
@@ -253,6 +255,8 @@ myGIOmap.prototype.routeLayers = function(lys, chartElement){
 			that.addZipChloropleth(d, chartElement);
 		} else if(layerType == "base" & layerMap == "userMap"){
 			that.dataAddedPolygon(d, chartElement);
+		} else if(layerType == "base" & layerMap == "resourceMap"){
+			that.addResourcePolygons(d, chartElement);
 		} else if(layerType == "usBase"){
 			that.usBase(d, chartElement);
 		} else if(layerType == "point"){
@@ -394,6 +398,171 @@ myGIOmap.prototype.addPolygons = function(ly, chartElement){
 		// console.log("zoom to us");
 		// zoomToBounds(boundingExtent(shapes.features, path),that, m, 1.5);
 	// }
+}
+
+myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
+	var that = this;
+	var m = this.margin;
+	
+	//formats
+	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
+	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
+	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+	
+	if(this.options.file_path){
+		d3.json(this.options.file_path, function(error, data){
+			
+			//define values from layer
+			var data_ly = HTMLWidgets.dataframeToD3(ly.data);
+			var dataKey = ly.mapping.dataKey;
+			var dataValue = ly.mapping.dataValue;
+			var mapKey = ly.mapping.mapKey;
+			
+			var objects = [];
+			
+			data.features.forEach(function(d, i){
+				
+				//new_data.properties.GEOID10 = new_data.properties.GEOID10[0];
+				//new_data.geometry.coordinates = new_data.geometry.coordinates[0];
+				
+				var thisObject = d.properties[mapKey];
+		
+				d.properties.values = data_ly.filter(function(e) { 
+					 
+					return e[dataKey] == thisObject; 
+				});
+				
+				objects.push(d);
+				
+				
+			});
+			
+			update(objects)
+		});
+	}
+	
+	function update(us){
+		console.log(us);
+		//set projection
+	var projection = getProjection(that.options.projection);
+	
+	projection
+		.translate([
+			(that.width - (m.right+m.left)) / 2,
+			(that.height - (m.top + m.bottom)) / 2
+		]);
+		
+	//set path function
+	var path = d3.geoPath().projection(projection);
+	
+	//update pattern for polygons
+	var polygons = that.chart.append('g')
+		.attr('class', 'counties')
+		.selectAll('path')
+		.data(us);
+	
+	polygons.exit().remove();
+
+	var newPolygons = polygons.enter()
+		.append('path')
+		.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
+		.attr('class', 'zip')
+		.style('fill', 'none')
+		.style('stroke', 'gray')
+		.style('stroke-width', '0.02px')
+		.style('opacity', 0)
+		.on('mouseover', hoverTip)
+		.on('mousemove', hoverTip)
+		.on('mouseout', hoverTipHide)
+		.on('click', function(d){
+			if(ly.options.setPolygonZoom.behavior){
+				if(ly.options.setPolygonZoom.behavior == 'click'){
+					var current_polygon = d3.select(this).data()[0];
+					Shiny.onInputChange(chartElement.id + "_selectedPolygon", current_polygon);
+					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale * 4);
+				}
+			}
+		})
+		;
+	
+	polygons
+		.merge(newPolygons)
+		.style('fill', function(d){ 
+			if(!d.properties.values[0]) return
+			var values = d.properties.values[0];
+			var colorValue = values[ly.mapping.dataValue];
+			return that.colorScale(colorValue); 
+			})
+	    .attr("d", path); 
+		
+	zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
+	
+	that.updateLegend();
+	
+	function hoverTip(){
+		//TODO: get the mouse events translated to zoomed scale
+		var coord = d3.mouse(this);
+		var transform = d3.zoomTransform( that.svg.node() );
+		var coordNew = transform.invert(coord);
+		
+		var object = d3.select(this).data()[0];
+		var objectBox = path.bounds(object);
+		var objectData = object.properties.values[0];
+		
+		if( HTMLWidgets.shinyMode & d3.select('#sidebarCollapsed') ){
+			var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
+		} else {
+			var sidebar = false;
+		}
+		var xMove = sidebar == false ? 50 : 0;
+		var nameFormat = ly.options.nameFormat != "text" ? d3.format(ly.options.nameFormat ? ly.options.nameFormat : "d") : function(x) {return x;} ;
+		var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
+		var toolTipFormat = d3.format(ly.options.toolTipFormat ? ly.options.toolTipFormat : "d");
+		
+		d3.select(this).transition()
+			.style('fill', function(d){ 
+				
+				var values = d.properties.values[0];
+				
+				var colorValue = values[ly.mapping.dataValue];
+				
+				return d3.rgb(that.colorScale(colorValue)).darker(1); 
+				});
+		
+		var mapObject = d3.select(this).data()[0].properties;
+		
+		that.tooltip
+			  .style("left", 5 + 'px')
+			  .style("top", 60 + 'px')
+			  .style("display", "inline-block")
+			  .html(function() {
+				  if(ly.options.toolTipFormat){
+					  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+					  
+					return nameFormat(labelValue) + '<br>' + 
+					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
+					ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
+				  } else {
+					  var labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+					  
+					return '' + labelValue + '<br>' + 
+					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
+				  }
+			  });
+	  
+	}
+
+	function hoverTipHide(){
+		d3.select(this).transition()
+			.style('fill', function(d){ 
+				var values = d.properties.values[0];
+				var colorValue = values[ly.mapping.dataValue];
+				return that.colorScale(colorValue); 
+			});
+		
+		that.tooltip.style("display", "none");
+		}
+	}
 }
 
 myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
@@ -871,6 +1040,163 @@ myGIOmap.prototype.update = function(x){
 myGIOmap.prototype.resize = function(chartElement){
 	
 }
+
+myGIOmap.prototype.addButtons = function(){
+	var that = this;
+			
+	var tempData = ["\uf019 \uf080", "\uf019 \uf0ce"];
+
+	var buttonDiv = d3.select(this.element).append("div")
+		.attr("class", "buttonDiv")
+		.style('opacity', 0)
+		.style("left", ( that.width - (.15 * that.width) ) + 'px')
+		.style("top", '0px')
+		.on("mouseover", function() { 
+					 
+					d3.select(that.element).select(".buttonDiv")
+						.style('opacity', 1);
+				})
+			.on("mouseout", function() { 
+				
+				d3.select(that.element).select(".buttonDiv")
+					.style('opacity', 0);
+				})
+			.on("mousemove", function(){
+				d3.select(that.element).select(".buttonDiv")
+					.style('opacity', 1);
+			});
+	
+	
+	var buttons = buttonDiv.selectAll('.button')
+		.data(tempData)
+	  .enter()
+		.append('input')
+		.attr('class', 'button')		
+		//.attr("transform", function(d) { return "translate(" +  tempData.indexOf(d)* 20 + ", 0)"; })
+		.attr('value', function(d){ console.log(d); return d; })
+		.on('click', function(d){
+			console.log(d + " Clicked!");
+			if(d == "\uf019 \uf080"){
+				var svgString = getSVGString(that.svg.node());
+				svgString2Image( svgString, 2*that.width, 2*that.height, 'png', save ); // passes Blob and filesize String to the callback
+
+				function save( dataBlob, filesize ){
+					saveAs( dataBlob, that.element.id + '.png' ); // FileSaver.js function
+				}
+			} else if(d == "\uf019 \uf0ce")
+				var csvData =  [];
+			
+				that.plotLayers.forEach(function(d){
+						csvData.push(d.data);
+					});
+					
+				var finalCSVData = [].concat.apply([], csvData);
+				
+				exportToCsv(that.element.id + '_data.csv', finalCSVData)
+			});
+	
+}
+
+function getSVGString( svgNode ) {
+	svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+	var cssStyleText = getCSSStyles( svgNode );
+	appendCSS( cssStyleText, svgNode );
+
+	var serializer = new XMLSerializer();
+	var svgString = serializer.serializeToString(svgNode);
+	svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
+	svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+
+	return svgString;
+
+	function getCSSStyles( parentElement ) {
+		var selectorTextArr = [];
+
+		// Add Parent element Id and Classes to the list
+		selectorTextArr.push( '#'+parentElement.id );
+		for (var c = 0; c < parentElement.classList.length; c++)
+				if ( !contains('.'+parentElement.classList[c], selectorTextArr) )
+					selectorTextArr.push( '.'+parentElement.classList[c] );
+
+		// Add Children element Ids and Classes to the list
+		var nodes = parentElement.getElementsByTagName("*");
+		for (var i = 0; i < nodes.length; i++) {
+			var id = nodes[i].id;
+			if ( !contains('#'+id, selectorTextArr) )
+				selectorTextArr.push( '#'+id );
+
+			var classes = nodes[i].classList;
+			for (var c = 0; c < classes.length; c++)
+				if ( !contains('.'+classes[c], selectorTextArr) )
+					selectorTextArr.push( '.'+classes[c] );
+		}
+
+		// Extract CSS Rules
+		var extractedCSSText = "";
+		for (var i = 0; i < document.styleSheets.length; i++) {
+			var s = document.styleSheets[i];
+			
+			try {
+			    if(!s.cssRules) continue;
+			} catch( e ) {
+		    		if(e.name !== 'SecurityError') throw e; // for Firefox
+		    		continue;
+		    	}
+
+			var cssRules = s.cssRules;
+			for (var r = 0; r < cssRules.length; r++) {
+				if ( contains( cssRules[r].selectorText, selectorTextArr ) )
+					extractedCSSText += cssRules[r].cssText;
+			}
+		}
+		
+		console.log(extractedCSSText);
+		return extractedCSSText;
+
+		function contains(str,arr) {
+			return arr.indexOf( str ) === -1 ? false : true;
+		}
+
+	}
+
+	function appendCSS( cssText, element ) {
+		var styleElement = document.createElement("style");
+		styleElement.setAttribute("type","text/css"); 
+		styleElement.innerHTML = cssText;
+		var refNode = element.hasChildNodes() ? element.children[0] : null;
+		element.insertBefore( styleElement, refNode );
+	}
+}
+
+
+function svgString2Image( svgString, width, height, format, callback ) {
+	var format = format ? format : 'png';
+
+	var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
+
+	var canvas = document.createElement("canvas");
+	var context = canvas.getContext("2d");
+
+	canvas.width = width;
+	canvas.height = height;
+
+	var image = new Image();
+	image.onload = function() {
+		context.clearRect ( 0, 0, width, height );
+		context.drawImage(image, 0, 0, width, height);
+
+		canvas.toBlob( function(blob) {
+			var filesize = Math.round( blob.length/1024 ) + ' KB';
+			if ( callback ) callback( blob, filesize );
+		});
+
+		
+	};
+
+	image.src = imgsrc;
+}
+
+var saveAs=saveAs||function(e){"use strict";if("undefined"==typeof navigator||!/MSIE [1-9]\./.test(navigator.userAgent)){var t=e.document,n=function(){return e.URL||e.webkitURL||e},o=t.createElementNS("http://www.w3.org/1999/xhtml","a"),r="download"in o,i=function(e){var t=new MouseEvent("click");e.dispatchEvent(t)},a=/Version\/[\d\.]+.*Safari/.test(navigator.userAgent),c=e.webkitRequestFileSystem,d=e.requestFileSystem||c||e.mozRequestFileSystem,u=function(t){(e.setImmediate||e.setTimeout)(function(){throw t},0)},s="application/octet-stream",f=0,l=4e4,v=function(e){var t=function(){"string"==typeof e?n().revokeObjectURL(e):e.remove()};setTimeout(t,l)},p=function(e,t,n){t=[].concat(t);for(var o=t.length;o--;){var r=e["on"+t[o]];if("function"==typeof r)try{r.call(e,n||e)}catch(i){u(i)}}},w=function(e){return/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type)?new Blob(["\uFEFF",e],{type:e.type}):e},y=function(t,u,l){l||(t=w(t));var y,m,S,h=this,R=t.type,O=!1,g=function(){p(h,"writestart progress write writeend".split(" "))},b=function(){if(m&&a&&"undefined"!=typeof FileReader){var o=new FileReader;return o.onloadend=function(){var e=o.result;m.location.href="data:attachment/file"+e.slice(e.search(/[,;]/)),h.readyState=h.DONE,g()},o.readAsDataURL(t),void(h.readyState=h.INIT)}if((O||!y)&&(y=n().createObjectURL(t)),m)m.location.href=y;else{var r=e.open(y,"_blank");void 0===r&&a&&(e.location.href=y)}h.readyState=h.DONE,g(),v(y)},E=function(e){return function(){return h.readyState!==h.DONE?e.apply(this,arguments):void 0}},N={create:!0,exclusive:!1};return h.readyState=h.INIT,u||(u="download"),r?(y=n().createObjectURL(t),void setTimeout(function(){o.href=y,o.download=u,i(o),g(),v(y),h.readyState=h.DONE})):(e.chrome&&R&&R!==s&&(S=t.slice||t.webkitSlice,t=S.call(t,0,t.size,s),O=!0),c&&"download"!==u&&(u+=".download"),(R===s||c)&&(m=e),d?(f+=t.size,void d(e.TEMPORARY,f,E(function(e){e.root.getDirectory("saved",N,E(function(e){var n=function(){e.getFile(u,N,E(function(e){e.createWriter(E(function(n){n.onwriteend=function(t){m.location.href=e.toURL(),h.readyState=h.DONE,p(h,"writeend",t),v(e)},n.onerror=function(){var e=n.error;e.code!==e.ABORT_ERR&&b()},"writestart progress write abort".split(" ").forEach(function(e){n["on"+e]=h["on"+e]}),n.write(t),h.abort=function(){n.abort(),h.readyState=h.DONE},h.readyState=h.WRITING}),b)}),b)};e.getFile(u,{create:!1},E(function(e){e.remove(),n()}),E(function(e){e.code===e.NOT_FOUND_ERR?n():b()}))}),b)}),b)):void b())},m=y.prototype,S=function(e,t,n){return new y(e,t,n)};return"undefined"!=typeof navigator&&navigator.msSaveOrOpenBlob?function(e,t,n){return n||(e=w(e)),navigator.msSaveOrOpenBlob(e,t||"download")}:(m.abort=function(){var e=this;e.readyState=e.DONE,p(e,"abort")},m.readyState=m.INIT=0,m.WRITING=1,m.DONE=2,m.error=m.onwritestart=m.onprogress=m.onwrite=m.onabort=m.onerror=m.onwriteend=null,S)}}("undefined"!=typeof self&&self||"undefined"!=typeof window&&window||this.content);"undefined"!=typeof module&&module.exports?module.exports.saveAs=saveAs:"undefined"!=typeof define&&null!==define&&null!==define.amd&&define([],function(){return saveAs});
 
 function getProjection(name){
 	
