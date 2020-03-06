@@ -990,7 +990,7 @@ myGIOmap.prototype.updateLegend = function(){
 	
 	var legend = key.append('defs')
 		.append("svg:linearGradient")
-		.attr("id", "gradient")
+		.attr("id", this.element.id + "gradient")
 	    .attr("x1", "0%")
 	    .attr("y1", "100%")
 	    .attr("x2", "100%")
@@ -1015,7 +1015,7 @@ myGIOmap.prototype.updateLegend = function(){
 	key.append('rect')
 		.attr("width", 250)
         .attr("height", 30)
-        .style("fill", "url(#gradient)")
+        .style("fill", "url(#"+ this.element.id + "gradient)")
         .attr("transform", "translate(5,10)");
 	 
 	key.append("g")
