@@ -408,7 +408,7 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
 	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
 	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
-	
+	console.log(this.options.file_path);
 	if(this.options.file_path){
 		d3.json(this.options.file_path, function(error, data){
 			console.log(data);
