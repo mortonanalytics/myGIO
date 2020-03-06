@@ -40,6 +40,8 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
+   addResourcePath("maps", "./maps" )
+
    output$map <- renderMyGIO({
      df <- data.frame(KCTA_ID = paste0("K", 101:350),
                       label = paste0("A", 101:350),
@@ -58,7 +60,7 @@ server <- function(input, output) {
                 options = c(myGIO::setPolygonZoom(behavior = "click",zoomScale = 45),
                             nameFormat = 'text')
                 ) %>%
-         readGeoJSON("cta.geojson")
+         readGeoJSON("./maps/cta.geojson")
    })
 
    output$data <- renderPrint({

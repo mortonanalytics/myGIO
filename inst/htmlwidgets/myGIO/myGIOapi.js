@@ -410,8 +410,9 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
 	console.log(this.options.file_path);
 
-		d3.json(this.options.file_path, function(error, data){
-			console.log(error);
+		d3.json(this.options.file_path)
+			.then(function(data){
+	
 			console.log(data);
 			//define values from layer
 			var data_ly = HTMLWidgets.dataframeToD3(ly.data);
@@ -1045,7 +1046,7 @@ myGIOmap.prototype.resize = function(chartElement){
 myGIOmap.prototype.addButtons = function(){
 	var that = this;
 			
-	var tempData = ["\uf019 \uf080", "\uf019 \uf0ce"];
+	var tempData = ["\uf019 \uf080"];
 
 	var buttonDiv = d3.select(this.element).append("div")
 		.attr("class", "buttonDiv")
