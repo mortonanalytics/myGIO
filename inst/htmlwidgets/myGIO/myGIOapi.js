@@ -534,8 +534,8 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 		var mapObject = d3.select(this).data()[0].properties;
 		
 		that.tooltip
-			  .style("left", 5 + 'px')
-			  .style("top", 60 + 'px')
+			  .style("left", (that.width * 0.85) + 'px')
+			  .style("top", 0 + 'px')
 			  .style("display", "inline-block")
 			  .html(function() {
 				  if(ly.options.toolTipFormat){
@@ -1040,7 +1040,7 @@ myGIOmap.prototype.update = function(x){
 }
 
 myGIOmap.prototype.resize = function(chartElement){
-	
+	this.draw(chartElement);
 }
 
 myGIOmap.prototype.addButtons = function(){
