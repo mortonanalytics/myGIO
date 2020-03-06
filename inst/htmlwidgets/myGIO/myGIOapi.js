@@ -411,7 +411,7 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 	
 	if(this.options.file_path){
 		d3.json(this.options.file_path, function(error, data){
-			
+			console.log(data);
 			//define values from layer
 			var data_ly = HTMLWidgets.dataframeToD3(ly.data);
 			var dataKey = ly.mapping.dataKey;
