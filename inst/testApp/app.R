@@ -57,7 +57,7 @@ server <- function(input, output) {
                                dataValue = "data",
                                dataLabel = "KCTA_NAME",
                                mapKey = "KCTA_ID"),
-                options = c(myGIO::setPolygonZoom(behavior = "click",zoomScale = 45),
+                options = c(myGIO::setPolygonZoom(behavior = "click",zoomScale = 20),
                             nameFormat = 'text')
                 ) %>%
          readGeoJSON("./maps/cta.geojson")

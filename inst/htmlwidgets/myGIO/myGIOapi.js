@@ -53,8 +53,8 @@ myGIOmap.prototype.setClipPath = function(chartElement){
 	this.clipPath = this.plot.append('defs').append('svg:clipPath')
 		.attr('id', chartElement.id + 'clip')
 	  .append('svg:rect')
-		.attr('x', 0)
-		.attr('y', 0)
+		//.attr('x', this.margin.left)
+		//.attr('y', this.margin.top)
 		.attr('width', this.width - (this.margin.left + this.margin.right))
 		.attr('height', this.height - (this.margin.top + this.margin.bottom));
 		
@@ -226,7 +226,7 @@ myGIOmap.prototype.processScales = function(lys, options){
 	var colorMean = d3.mean(data, function(d) { return d[dataValue]; });
 	
 	this.colorScale = d3.scaleLinear()
-		.range(["whitesmoke", "#FFBB00", "#FF8C00"])
+		.range(["#fff970", "#ffbd00", "#a99b00"])
 		.domain([colorMin, colorMean, colorExtent[1]]);
 	
 	this.legendScale = d3.scaleLinear()
@@ -534,8 +534,8 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 		var mapObject = d3.select(this).data()[0].properties;
 		
 		that.tooltip
-			  .style("left", (that.width * 0.85) + 'px')
-			  .style("top", 0 + 'px')
+			  .style("left", 0 + 'px')
+			  .style("top", 60 + 'px')
 			  .style("display", "inline-block")
 			  .html(function() {
 				  if(ly.options.toolTipFormat){
@@ -999,17 +999,17 @@ myGIOmap.prototype.updateLegend = function(){
 		
 	legend.append("stop")
       .attr("offset", "0%")
-      .attr("stop-color", "whitesmoke")
+      .attr("stop-color", "#fff970")
       .attr("stop-opacity", 1);
 
     legend.append("stop")
       .attr("offset", "50%")
-      .attr("stop-color", "#FFBB00")
+      .attr("stop-color", "#ffbd00")
       .attr("stop-opacity", 1);
 
     legend.append("stop")
       .attr("offset", "100%")
-      .attr("stop-color", "#FF8C00")
+      .attr("stop-color", "#a99b00")
       .attr("stop-opacity", 1);
 	  
 	key.append('rect')
