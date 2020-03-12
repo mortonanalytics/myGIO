@@ -26,3 +26,30 @@
 	background-color: #04A1FF;
     color: white;
 }
+
+.buttonDiv {
+  pointer-events: all;
+  position: absolute;
+  display: inline-block;
+  min-width: 30px;
+  height: auto;
+  background: rgba(255,255,255,0.20);
+  padding: 2px;
+  text-align: center;
+}
+
+.button {
+  color: rgba(0,0,0,0.30);
+  border-color: rgba(0,0,0,0.30);
+  border-radius: 5px;
+  padding: 3px;
+  margin: 3px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  width: 40px;
+  height: 25px;
+  font-family: FontAwesome;
+  text-rendering: optimizeLegibility;
+}
