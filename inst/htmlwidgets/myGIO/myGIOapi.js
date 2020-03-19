@@ -35,7 +35,7 @@ myGIOmap.prototype.draw = function(chartElement){
 	this.chart = this.plot.append('g')
 		.attr('class', 'chartArea');
 	
-	this.addButtons();
+	//this.addButtons();
 	
 	//add tooltip div
 	this.tooltip = d3.select(this.element).append("div").attr("class", "toolTip");
