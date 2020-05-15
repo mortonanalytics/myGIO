@@ -20,11 +20,17 @@
   opacity: 1;
   box-shadow: 0px 3px 9px rgba(0, 0, 0, .15);
 }
-.zoom, .resetMap {
-	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+.resetMap {
 	text-align: center;
-	background-color: #04A1FF;
-    color: white;
+	background-color: rgba(255,255,255,0.2);
+    color: rgba(0, 0, 0, .65);
+	border-radius: 5%
+}
+
+.zoom {
+	text-align: center;
+	background-color: rgba(255,255,255,0.2);
+    color: rgba(0, 0, 0, .65);
 }
 
 .buttonDiv {
@@ -34,21 +40,15 @@
   min-width: 30px;
   height: auto;
   background: rgba(255,255,255,0.20);
-  padding: 2px;
   text-align: center;
 }
 
 .button {
   color: rgba(0,0,0,0.30);
-  border-color: rgba(0,0,0,0.30);
-  border-radius: 5px;
-  padding: 3px;
-  margin: 3px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 14px;
-  width: 40px;
   height: 25px;
   font-family: FontAwesome;
   text-rendering: optimizeLegibility;

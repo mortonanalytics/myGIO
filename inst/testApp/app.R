@@ -31,7 +31,7 @@ ui <- fluidPage(
 
       # Show a plot of the generated distribution
       mainPanel(
-         myGIOOutput("map", height = '700px'),
+         myGIOOutput("map", height = '750px', width = "100%"),
          verbatimTextOutput("data")
       )
    )
@@ -64,7 +64,26 @@ server <- function(input, output) {
    })
 
    output$data <- renderPrint({
-     input$map_selectedPolygon
+     input$mapTopo_selectedPolygon
+   })
+
+   output$mapTopo <- renderMyGIO({
+      df <- data.frame(KCTA_ID = paste0("K", 101:350),
+                       label = paste0("A", 101:350),
+                       data = 101:150 * rnorm(5, mean = input$bins, sd = 2),
+                       stringsAsFactors = FALSE)
+      myGIO() %>%
+         addBase(base = "resourceMapTopo",
+                 data = df,
+                 geoJson = df,
+                 mapping = list(dataKey = "KCTA_ID",
+                                dataValue = "data",
+                                dataLabel = "KCTA_NAME",
+                                mapKey = "KCTA_ID"),
+                 options = c(myGIO::setPolygonZoom(behavior = "click",zoomScale = 15),
+                             nameFormat = 'text')
+         ) %>%
+         readGeoJSON("./maps/tx_counties.topojson")
    })
 }
 

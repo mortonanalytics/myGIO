@@ -14,7 +14,7 @@ addBase <- function(myGIO, base, data = NULL, geoJson = NULL, mapping = NULL, op
 
   #assert layer type
   stopifnot(is.character(base))
-  stopifnot(base %in% c("world", "us", "zipChloropleth", "userMap", "resourceMap"))
+  stopifnot(base %in% c("world", "us", "zipChloropleth", "userMap", "resourceMap", "resourceMapTopo"))
 
   layer <- list(
     type = "base",

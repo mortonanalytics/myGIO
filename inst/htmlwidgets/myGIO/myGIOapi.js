@@ -99,7 +99,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					return eventTransform;
 				}
 			});
-	  //remove polygon fill below a certain opacity	
+	  //remove polygon fill below a certain zoom	
 	  if(1/(d3.event.transform.k) < 0.65){
 		  that.chart.selectAll('.states').style('fill', 'none');
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
@@ -177,8 +177,7 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 		.style('position', 'absolute')
 		.style('right', function(d,i){ return (i * 30) + 'px'})
 		.style('top', '30px')
-		.style('border-radius', '2px')
-		.style('width', '25px')
+		.style('width', '30px')
 		.html(function(d){
 			return d;
 		})
@@ -201,8 +200,7 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 		.style('position', 'absolute')
 		.style('right', '0px')
 		.style('top', '60px')
-		.style('border-radius', '2px')
-		.style('width', '56px')
+		.style('width', '60px')
 		.html(function(d){
 			return d;
 		})
@@ -257,7 +255,9 @@ myGIOmap.prototype.routeLayers = function(lys, chartElement){
 			that.dataAddedPolygon(d, chartElement);
 		} else if(layerType == "base" & layerMap == "resourceMap"){
 			that.addResourcePolygons(d, chartElement);
-		} else if(layerType == "usBase"){
+		}else if(layerType == "base" & layerMap == "resourceMapTopo"){
+			that.addResourceTopoPolygons(d, chartElement);
+		}else if(layerType == "usBase"){
 			that.usBase(d, chartElement);
 		} else if(layerType == "point"){
 			that.addPoints(d, chartElement);
@@ -565,6 +565,176 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 		that.tooltip.style("display", "none");
 		}
 	}
+}
+
+myGIOmap.prototype.addResourceTopoPolygons = function(ly, chartElement){
+	var that = this;
+	var m = this.margin;
+	
+	//formats
+	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
+	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
+	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
+
+	d3.json(this.options.file_path)
+		.then(function(data){					
+		
+			draw(data);
+		
+		})
+		.then( function(){
+			that.updateFill(ly, chartElement);
+			that.updateLegend();
+		});
+	
+	
+	function draw(us){
+		console.log(us);
+		//set projection
+		var projection = getProjection(that.options.projection);
+		
+		projection
+			.translate([
+				(that.width - (m.right+m.left)) / 2,
+				(that.height - (m.top + m.bottom)) / 2
+			]);
+			
+		//set path function
+		var path = d3.geoPath().projection(projection);
+		
+		//update pattern for polygons
+		var polygons = that.chart.append('g')
+			.attr('class', 'counties')
+			.selectAll('path')
+			.data(topojson.feature(us, us.objects.County).features);
+		
+		polygons.exit().remove();
+
+		var newPolygons = polygons.enter()
+			.append('path')
+			.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
+			.attr('class', 'county-shape')
+			.style('stroke', 'transparent');
+		
+		polygons
+			.merge(newPolygons)
+			.style('fill', 'lightgray')
+			.attr("d", path); 
+			
+		zoomToBounds( boundingExtent( that.chart.selectAll('.county-shape').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
+		
+	}
+}
+
+myGIOmap.prototype.updateFill = function(ly, chartElement){
+	
+	var polygons = d3.select(chartElement).selectAll('.county-shape');
+	console.log(polygons);
+	
+	var data_ly = HTMLWidgets.dataframeToD3(ly.data);
+	var dataKey = ly.mapping.dataKey;
+	var dataValue = ly.mapping.dataValue;
+	var mapKey = ly.mapping.mapKey;
+	
+	polygons.each(function(d){
+		
+		//d is the map data
+		console.log(d);
+		
+		//this is the selection
+		console.log( d3.select(this) );
+	});
+	/*
+	polygons.forEach(function(d){
+		console.log(d)
+		
+		var thisObject = d.properties[mapKey];
+
+		d.properties.values = data_ly.filter(function(e) { 
+			 
+			return e[dataKey] == thisObject; 
+		});		
+		
+	});
+	
+	polygons
+		.on('mouseover', hoverTip)
+		.on('mousemove', hoverTip)
+		.on('mouseout', hoverTipHide)
+		.on('click', function(d){
+			if(ly.options.setPolygonZoom.behavior){
+				if(ly.options.setPolygonZoom.behavior == 'click'){
+					var current_polygon = d3.select(this).data()[0].properties;
+					Shiny.onInputChange(chartElement.id + "_selectedPolygon", current_polygon);
+					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale * 4);
+				}
+			}
+		});
+	*/
+	function hoverTip(){
+		//TODO: get the mouse events translated to zoomed scale
+		var coord = d3.mouse(this);
+		var transform = d3.zoomTransform( that.svg.node() );
+		var coordNew = transform.invert(coord);
+		
+		var object = d3.select(this).data()[0];
+		var objectBox = path.bounds(object);
+		var objectData = object.properties.values[0];
+		
+		if( HTMLWidgets.shinyMode & d3.select('#sidebarCollapsed') ){
+			var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
+		} else {
+			var sidebar = false;
+		}
+		var xMove = sidebar == false ? 50 : 0;
+		var nameFormat = ly.options.nameFormat != "text" ? d3.format(ly.options.nameFormat ? ly.options.nameFormat : "d") : function(x) {return x;} ;
+		var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
+		var toolTipFormat = d3.format(ly.options.toolTipFormat ? ly.options.toolTipFormat : "d");
+		
+		d3.select(this).transition()
+			.style('fill', function(d){ 
+				
+				var values = d.properties.values[0];
+				
+				var colorValue = values[ly.mapping.dataValue];
+				
+				return d3.rgb(that.colorScale(colorValue)).darker(1); 
+				});
+		
+		var mapObject = d3.select(this).data()[0].properties;
+		
+		that.tooltip
+			  .style("left", 0 + 'px')
+			  .style("top", 60 + 'px')
+			  .style("display", "inline-block")
+			  .html(function() {
+				  if(ly.options.toolTipFormat){
+					  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+					  
+					return nameFormat(labelValue) + '<br>' + 
+					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
+					ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
+				  } else {
+					  var labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+					  
+					return '' + labelValue + '<br>' + 
+					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
+				  }
+			  });
+	  
+	}
+
+	function hoverTipHide(){
+		d3.select(this).transition()
+			.style('fill', function(d){ 
+				var values = d.properties.values[0];
+				var colorValue = values[ly.mapping.dataValue];
+				return that.colorScale(colorValue); 
+			});
+		
+		that.tooltip.style("display", "none");
+		}
+	
 }
 
 myGIOmap.prototype.addZipChloropleth = function(ly, chartElement){
