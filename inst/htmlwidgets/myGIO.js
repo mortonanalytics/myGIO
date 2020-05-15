@@ -31,7 +31,7 @@ HTMLWidgets.widget({
 
         //chart will use its own resize method
         if(this.map) {
-			this.map.resize(document.getElementById(el.id));
+			this.map.resize(width, height);
 		}
 
       }

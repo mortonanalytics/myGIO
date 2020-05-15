@@ -6,7 +6,6 @@ var myGIOmap = function(opts){
 	this.element = opts.element;
 	this.mapLayers = opts.mapLayers;
 	this.options = opts.options;
-	console.log(opts);
 	//create the chart 
 	//widget calls the update function if chart already exists
 	this.draw(this.element);
@@ -15,10 +14,10 @@ var myGIOmap = function(opts){
 myGIOmap.prototype.draw = function(chartElement){
 	
 	//define dimensions
-	this.width = chartElement.offsetWidth;
-	this.height = Math.max(chartElement.offsetHeight);
+	this.width = Math.max(chartElement.offsetWidth, 350);
+	this.height = Math.max(chartElement.offsetHeight, 350);
 	var user_margins = this.options.margins;
-	this.margin = { top: user_margins.top, right: user_margins.right, bottom: user_margins.bottom, left: user_margins.left};
+	this.margin = { top: user_margins.top, right: this.width > 400 ? user_margins.right: 10, bottom: user_margins.bottom, left:  this.width > 400 ? user_margins.left : 0};
 	
 	//set up parent element and SVG
 	chartElement.innerHTML = '';
@@ -50,6 +49,7 @@ myGIOmap.prototype.draw = function(chartElement){
 }
 
 myGIOmap.prototype.setClipPath = function(chartElement){
+	
 	this.clipPath = this.plot.append('defs').append('svg:clipPath')
 		.attr('id', chartElement.id + 'clip')
 	  .append('svg:rect')
@@ -176,7 +176,7 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 		.attr('id', function(d) { return d })
 		.style('position', 'absolute')
 		.style('right', function(d,i){ return (i * 30) + 'px'})
-		.style('top', '30px')
+		.style('top', '0px')
 		.style('width', '30px')
 		.html(function(d){
 			return d;
@@ -199,7 +199,7 @@ myGIOmap.prototype.addZoomButtons = function(chartElement){
 		.attr('id', function(d) { return d })
 		.style('position', 'absolute')
 		.style('right', '0px')
-		.style('top', '60px')
+		.style('top', '30px')
 		.style('width', '60px')
 		.html(function(d){
 			return d;
@@ -228,7 +228,7 @@ myGIOmap.prototype.processScales = function(lys, options){
 		.domain([colorMin, colorMean, colorExtent[1]]);
 	
 	this.legendScale = d3.scaleLinear()
-		.range([ 0, 250 ])
+		.range([ 0, Math.max(150, this.width * .25) ])
 		.domain([ colorMin, colorExtent[1] ]);
 	
 	this.legendAxis = d3.axisBottom()
@@ -408,12 +408,10 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 	var nameFormat = that.options.nameFormat != "text" ? d3.format(that.options.nameFormat ? that.options.nameFormat : "d") : function(x) {return x;} ;
 	var valueFormat = d3.format(that.options.valueFormat ? that.options.valueFormat : "d");
 	var toolTipFormat = d3.format(that.options.toolTipFormat ? that.options.toolTipFormat : "d");
-	console.log(this.options.file_path);
 
 		d3.json(this.options.file_path)
 			.then(function(data){
 	
-			console.log(data);
 			//define values from layer
 			var data_ly = HTMLWidgets.dataframeToD3(ly.data);
 			var dataKey = ly.mapping.dataKey;
@@ -444,127 +442,126 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 	
 	
 	function update(us){
-		console.log(us);
 		//set projection
-	var projection = getProjection(that.options.projection);
-	
-	projection
-		.translate([
-			(that.width - (m.right+m.left)) / 2,
-			(that.height - (m.top + m.bottom)) / 2
-		]);
+		var projection = getProjection(that.options.projection);
 		
-	//set path function
-	var path = d3.geoPath().projection(projection);
-	
-	//update pattern for polygons
-	var polygons = that.chart.append('g')
-		.attr('class', 'counties')
-		.selectAll('path')
-		.data(us);
-	
-	polygons.exit().remove();
+		projection
+			.translate([
+				(that.width - (m.right+m.left)) / 2,
+				(that.height - (m.top + m.bottom)) / 2
+			]);
+			
+		//set path function
+		var path = d3.geoPath().projection(projection);
+		
+		//update pattern for polygons
+		var polygons = that.chart.append('g')
+			.attr('class', 'counties')
+			.selectAll('path')
+			.data(us);
+		
+		polygons.exit().remove();
 
-	var newPolygons = polygons.enter()
-		.append('path')
-		.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
-		.attr('class', 'zip')
-		.style('fill', 'none')
-		.style('stroke', 'gray')
-		.style('stroke-width', '0.02px')
-		.style('opacity', 0)
-		.on('mouseover', hoverTip)
-		.on('mousemove', hoverTip)
-		.on('mouseout', hoverTipHide)
-		.on('click', function(d){
-			if(ly.options.setPolygonZoom.behavior){
-				if(ly.options.setPolygonZoom.behavior == 'click'){
-					var current_polygon = d3.select(this).data()[0];
-					Shiny.onInputChange(chartElement.id + "_selectedPolygon", current_polygon);
-					zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale * 4);
+		var newPolygons = polygons.enter()
+			.append('path')
+			.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
+			.attr('class', 'zip')
+			.style('fill', 'none')
+			.style('stroke', 'gray')
+			.style('stroke-width', '0.02px')
+			.style('opacity', 0)
+			.on('mouseover', hoverTip)
+			.on('mousemove', hoverTip)
+			.on('mouseout', hoverTipHide)
+			.on('click', function(d){
+				if(ly.options.setPolygonZoom.behavior){
+					if(ly.options.setPolygonZoom.behavior == 'click'){
+						var current_polygon = d3.select(this).data()[0];
+						Shiny.onInputChange(chartElement.id + "_selectedPolygon", current_polygon);
+						zoomToBounds(boundingExtent(current_polygon, path), that, m, ly.options.setPolygonZoom.zoomScale * 4);
+					}
 				}
-			}
-		})
-		;
-	
-	polygons
-		.merge(newPolygons)
-		.style('fill', function(d){ 
-			if(!d.properties.values[0]) return
-			var values = d.properties.values[0];
-			var colorValue = values[ly.mapping.dataValue];
-			return that.colorScale(colorValue); 
 			})
-	    .attr("d", path); 
+			;
 		
-	zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
-	
-	that.updateLegend();
-	
-	function hoverTip(){
-		//TODO: get the mouse events translated to zoomed scale
-		var coord = d3.mouse(this);
-		var transform = d3.zoomTransform( that.svg.node() );
-		var coordNew = transform.invert(coord);
-		
-		var object = d3.select(this).data()[0];
-		var objectBox = path.bounds(object);
-		var objectData = object.properties.values[0];
-		
-		if( HTMLWidgets.shinyMode & d3.select('#sidebarCollapsed') ){
-			var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
-		} else {
-			var sidebar = false;
-		}
-		var xMove = sidebar == false ? 50 : 0;
-		var nameFormat = ly.options.nameFormat != "text" ? d3.format(ly.options.nameFormat ? ly.options.nameFormat : "d") : function(x) {return x;} ;
-		var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
-		var toolTipFormat = d3.format(ly.options.toolTipFormat ? ly.options.toolTipFormat : "d");
-		
-		d3.select(this).transition()
+		polygons
+			.merge(newPolygons)
 			.style('fill', function(d){ 
-				
-				var values = d.properties.values[0];
-				
-				var colorValue = values[ly.mapping.dataValue];
-				
-				return d3.rgb(that.colorScale(colorValue)).darker(1); 
-				});
-		
-		var mapObject = d3.select(this).data()[0].properties;
-		
-		that.tooltip
-			  .style("left", 0 + 'px')
-			  .style("top", 60 + 'px')
-			  .style("display", "inline-block")
-			  .html(function() {
-				  if(ly.options.toolTipFormat){
-					  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
-					  
-					return nameFormat(labelValue) + '<br>' + 
-					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
-					ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
-				  } else {
-					  var labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
-					  
-					return '' + labelValue + '<br>' + 
-					ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
-				  }
-			  });
-	  
-	}
-
-	function hoverTipHide(){
-		d3.select(this).transition()
-			.style('fill', function(d){ 
+				if(!d.properties.values[0]) return
 				var values = d.properties.values[0];
 				var colorValue = values[ly.mapping.dataValue];
 				return that.colorScale(colorValue); 
-			});
+				})
+			.attr("d", path); 
+			
+		zoomToBounds( boundingExtent( that.chart.selectAll('.zip').data(), path ), that, m, ly.options.setPolygonZoom.zoomScale);
 		
-		that.tooltip.style("display", "none");
+		that.updateLegend();
+		
+		function hoverTip(){
+			//TODO: get the mouse events translated to zoomed scale
+			var coord = d3.mouse(this);
+			var transform = d3.zoomTransform( that.svg.node() );
+			var coordNew = transform.invert(coord);
+			
+			var object = d3.select(this).data()[0];
+			var objectBox = path.bounds(object);
+			var objectData = object.properties.values[0];
+			
+			if( HTMLWidgets.shinyMode & d3.select('#sidebarCollapsed') ){
+				var sidebar = d3.select('#sidebarCollapsed').attr('data-collapsed');
+			} else {
+				var sidebar = false;
+			}
+			var xMove = sidebar == false ? 50 : 0;
+			var nameFormat = ly.options.nameFormat != "text" ? d3.format(ly.options.nameFormat ? ly.options.nameFormat : "d") : function(x) {return x;} ;
+			var valueFormat = d3.format(ly.options.valueFormat ? ly.options.valueFormat : "d");
+			var toolTipFormat = d3.format(ly.options.toolTipFormat ? ly.options.toolTipFormat : "d");
+			
+			d3.select(this).transition()
+				.style('fill', function(d){ 
+					
+					var values = d.properties.values[0];
+					
+					var colorValue = values[ly.mapping.dataValue];
+					
+					return d3.rgb(that.colorScale(colorValue)).darker(1); 
+					});
+			
+			var mapObject = d3.select(this).data()[0].properties;
+			
+			that.tooltip
+				  .style("left", 0 + 'px')
+				  .style("top", 60 + 'px')
+				  .style("display", "inline-block")
+				  .html(function() {
+					  if(ly.options.toolTipFormat){
+						  labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+						  
+						return nameFormat(labelValue) + '<br>' + 
+						ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue]) + '<br>' +
+						ly.mapping.toolTip + ": " + toolTipFormat(objectData[ly.mapping.toolTip])
+					  } else {
+						  var labelValue = ly.mapping.dataLabel ? mapObject[ly.mapping.dataLabel] : objectData[ly.mapping.dataKey];
+						  
+						return '' + labelValue + '<br>' + 
+						ly.mapping.dataValue + ": " + valueFormat(objectData[ly.mapping.dataValue])
+					  }
+				  });
+		  
 		}
-	}
+
+		function hoverTipHide(){
+			d3.select(this).transition()
+				.style('fill', function(d){ 
+					var values = d.properties.values[0];
+					var colorValue = values[ly.mapping.dataValue];
+					return that.colorScale(colorValue); 
+				});
+			
+			that.tooltip.style("display", "none");
+			}
+		}
 }
 
 myGIOmap.prototype.addResourceTopoPolygons = function(ly, chartElement){
@@ -1152,7 +1149,7 @@ myGIOmap.prototype.dataAddedPolygon = function(ly, chartElement){
 myGIOmap.prototype.updateLegend = function(){
 	var that = this;
 	
-	d3.selectAll('.legendBar').remove();
+	d3.select(this.element).selectAll('.legendObject').remove();
 	
 	var key = this.svg
 		.append('g')
@@ -1183,7 +1180,7 @@ myGIOmap.prototype.updateLegend = function(){
       .attr("stop-opacity", 1);
 	  
 	key.append('rect')
-		.attr("width", 250)
+		.attr("width", Math.max(150, this.width * .25) )
         .attr("height", 30)
         .style("fill", "url(#"+ this.element.id + "gradient)")
         .attr("transform", "translate(5,10)");
@@ -1209,8 +1206,26 @@ myGIOmap.prototype.update = function(x){
 	this.draw(this.element);
 }
 
-myGIOmap.prototype.resize = function(chartElement){
-	this.draw(chartElement);
+myGIOmap.prototype.resize = function(width, height){
+	this.draw(this.element);
+	/*
+	this.svg
+		.attr('width', Math.max(width, 350))
+		.attr('height', Math.max(height, 350));
+		
+	this.plot
+		.attr('transform','translate('+this.margin.left+','+this.margin.top+')');
+		
+	this.clipPath
+		.attr('x', 0)
+		.attr('y', 0)
+		.attr('width', Math.max(width, 350) - (this.margin.left + this.margin.right))
+		.attr('height', Math.max(height, 350) - (this.margin.top + this.margin.bottom));
+	
+	this.updateLegend();
+	
+	this.routeLayers(this.mapLayers, chartElement);
+	*/			
 }
 
 myGIOmap.prototype.addButtons = function(){
@@ -1317,7 +1332,7 @@ function getSVGString( svgNode ) {
 			var id = nodes[i].id;
 			if ( !contains('#'+id, selectorTextArr) )
 				selectorTextArr.push( '#'+id );
-
+			selectorTextArr.push( '@'+id );
 			var classes = nodes[i].classList;
 			for (var c = 0; c < classes.length; c++)
 				if ( !contains('.'+classes[c], selectorTextArr) )
@@ -1530,7 +1545,7 @@ function zoomToBounds(boxes,that,m, zoomScale){
 		.scale(scale);
 	
 	that.svg.transition()
-		.duration(1000)
+		.duration(100)
 		.call(that.zoom.transform, transform);
 }
 
