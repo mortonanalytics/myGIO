@@ -36,36 +36,38 @@
 }
 .resetMap {
 	text-align: center;
-	background-color: rgba(255,255,255,0.2);
+	fill: rgba(255,255,255,0.2);
     color: rgba(0, 0, 0, .65);
-	border-radius: 5%
+	stroke: black;
 }
 
 .zoom {
 	text-align: center;
-	background-color: rgba(255,255,255,0.2);
+	fill: rgba(255,255,255,0.2);
     color: rgba(0, 0, 0, .65);
+	stroke: rgba(0, 0, 0, .65);
 }
 
 .buttonDiv {
   pointer-events: all;
-  position: absolute;
-  display: inline-block;
-  min-width: 30px;
+  /*position: absolute;
+  display: inline-block;*/
+  min-width: 40px;
   height: auto;
-  background: rgba(255,255,255,0.20);
-  text-align: center;
+  background: transparent;
 }
 
 .button {
-  color: rgba(0,0,0,0.30);
+  fill: #7a7a52;
+  border-radius: 5px;
+  padding: 3px;
+  margin: 3px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 14px;
+  width: 40px;
   height: 25px;
-  font-family: FontAwesome;
-  text-rendering: optimizeLegibility;
 }
 
 .legend{
