@@ -12,23 +12,29 @@ var myGIOmap = function(opts){
 }
 
 myGIOmap.prototype.draw = function(chartElement){
-	
+	var that = this;
 	//define dimensions
 	this.width = Math.max(chartElement.offsetWidth, 350);
 	this.height = Math.max(chartElement.offsetHeight, 350);
 	var user_margins = this.options.margins;
-	this.margin = { top: user_margins.top, right: this.width > 400 ? user_margins.right: 10, bottom: user_margins.bottom, left:  this.width > 400 ? user_margins.left : 0};
+
+	this.margin = { top: user_margins.top, 
+					right: this.width > 500 ? user_margins.right: 10, 
+					bottom: user_margins.bottom, 
+					left:  this.width > 500 ? user_margins.left : 0};
+	console.log(this.margin);
 	
 	//set up parent element and SVG
 	chartElement.innerHTML = '';
 	
 	this.svg = d3.select(chartElement).append('svg')
-		.attr('id', chartElement.id + '-svg-chart')
+		.attr('id', chartElement.id + '-myGIO-map')
 		.attr('width', this.width)
 		.attr('height', this.height);
 	
 	//create g element
 	this.plot = this.svg.append('g')
+		.attr('id', chartElement.id + '-myGIO-area')
 		.attr('transform','translate('+this.margin.left+','+this.margin.top+')');
 	
 	this.chart = this.plot.append('g')
@@ -40,11 +46,23 @@ myGIOmap.prototype.draw = function(chartElement){
 	this.tooltip = d3.select(this.element).append("div").attr("class", "toolTip");
 	
 	//initialize chart
-	this.setClipPath(chartElement);
-	this.setZoom(chartElement);
-	this.addZoomButtons(chartElement);
-	this.processScales(this.mapLayers, this.options);
-	this.routeLayers(this.mapLayers, chartElement);
+	async function asyncCall() {
+		/*
+		await that.setClipPath(chartElement);
+		await that.setZoom(chartElement);
+		await that.addZoomButtons(chartElement);
+		await that.processScales(that.mapLayers, that.options);
+		await that.routeLayers(that.mapLayers, chartElement);
+		*/
+	}
+
+	asyncCall()
+		.then(that.setClipPath(chartElement))
+		.then(that.setZoom(chartElement))
+		.then(that.addZoomButtons(chartElement))
+		.then(that.processScales(that.mapLayers, that.options))
+		.then(that.routeLayers(that.mapLayers, chartElement))
+		;
 	
 }
 
@@ -53,8 +71,6 @@ myGIOmap.prototype.setClipPath = function(chartElement){
 	this.clipPath = this.plot.append('defs').append('svg:clipPath')
 		.attr('id', chartElement.id + 'clip')
 	  .append('svg:rect')
-		//.attr('x', this.margin.left)
-		//.attr('y', this.margin.top)
 		.attr('width', this.width - (this.margin.left + this.margin.right))
 		.attr('height', this.height - (this.margin.top + this.margin.bottom));
 		
@@ -76,21 +92,24 @@ myGIOmap.prototype.setZoom = function(chartElement){
 		.call(this.zoom);
 		
 	function zoomed() {
-	  that.chart.attr("transform", d3.event.transform);
-	  //set zoom behavior for states
-	  that.chart.selectAll('.states')
-		.style("stroke-width", 1.2 / d3.event.transform.k + "px")
-		.style('fill-opacity', function(){
-			var eventTransform = 1/(d3.event.transform.k);
-			if(eventTransform > 0.65){
-				return 1;
-			} else {
-				return eventTransform;
-			}
-		});
-		//set zoom behavior for countries
-		that.chart.selectAll('.countries')
-			.style("stroke-width", 1 / d3.event.transform.k + "px")
+		/*
+		var t = d3.event.transform;
+		var s = d3.event.transform.k;
+		
+		that.clipPath
+			.attr("transform", "scale(" + 1/s + ")")
+			.attr("x", 0 - t.x ) 
+			.attr("y", 0 - t.y );
+		*/
+		var t = d3.zoomTransform(this);
+		
+		that.clipPath
+			.attr("transform", "scale(" + t.k + ")");
+			
+		that.chart.attr("transform", t);
+		//set zoom behavior for states
+		that.chart.selectAll('.states')
+			.style("stroke-width", 1.2 / d3.event.transform.k + "px")
 			.style('fill-opacity', function(){
 				var eventTransform = 1/(d3.event.transform.k);
 				if(eventTransform > 0.65){
@@ -99,19 +118,31 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					return eventTransform;
 				}
 			});
-	  //remove polygon fill below a certain zoom	
-	  if(1/(d3.event.transform.k) < 0.65){
+		//set zoom behavior for countries
+		that.chart.selectAll('.countries')
+			.style("stroke-width", 1 / t.k + "px")
+			.style('fill-opacity', function(){
+				var eventTransform = 1/(t.k);
+				if(eventTransform > 0.65){
+					return 1;
+				} else {
+					return eventTransform;
+				}
+			});
+
+		//remove polygon fill below a certain zoom	
+		if(1/(t.k) < 0.65){
 		  that.chart.selectAll('.states').style('fill', 'none');
 		  that.chart.selectAll('.countries').style('stroke-width', 0); 
-		  that.chart.selectAll('.zip').style('opacity', 1).style('stroke-width', 1 / d3.event.transform.k + "px"); 
-	  } else if(1/(d3.event.transform.k) < 0.95){
+		  that.chart.selectAll('.zip').style('opacity', 1).style('stroke-width', 1 / t.k + "px"); 
+		} else if(1/(t.k) < 0.95){
 		that.chart.selectAll('.zip').style('stroke-width', 0);
-	  } else {
-		that.chart.selectAll('.countries').style('stroke-width', 1 / d3.event.transform.k + "px"); 
+		} else {
+		that.chart.selectAll('.countries').style('stroke-width', 1 / t.k + "px"); 
 		that.chart.selectAll('.zip').style('opacity', 0);
-	  }
-	  
-	  // that.chart.selectAll('.counties-text')
+		}
+
+		// that.chart.selectAll('.counties-text')
 		// .style('opacity', function(){
 			// var eventTransform = 1/(d3.event.transform.k);
 				// if(eventTransform > 0.02){
@@ -120,7 +151,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					// return 1;
 				// }
 		// });
-		
+
 		that.chart.selectAll('.zip-text')
 			.attr("font-size", 12 / d3.event.transform.k + "px")
 			.attr("dy", -15 / d3.event.transform.k)
@@ -133,7 +164,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 				}
 		});
 			//.style('text-shadow',  "0px 0px 3px white");
-		
+
 		that.chart.selectAll('.zip-text2')
 			.attr("font-size", 12 / d3.event.transform.k + "px")
 			//.style('text-shadow',  "0px 0px 3px white")
@@ -146,7 +177,7 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					return 1;
 				}
 		});
-		
+
 		that.chart.selectAll('.zip-text3')
 			.attr("font-size", 12 / d3.event.transform.k + "px")
 			//.style('text-shadow',  "0px 0px 3px white")
@@ -159,8 +190,8 @@ myGIOmap.prototype.setZoom = function(chartElement){
 					return 1;
 				}
 		});
-	  
-	}
+
+		}
 }
 
 myGIOmap.prototype.addZoomButtons = function(chartElement){
@@ -505,9 +536,11 @@ myGIOmap.prototype.addResourcePolygons = function(ly, chartElement){
 		var path = d3.geoPath().projection(projection);
 		
 		//update pattern for polygons
-		var polygons = that.chart.append('g')
+		var polygons = that.chart
+			.append('g')
+			.attr('clip-path', 'url(#' + chartElement.id + 'clip'+ ')')
 			.attr('class', 'counties')
-			.selectAll('path')
+			.selectAll('.zip')
 			.data(us);
 		
 		polygons.exit().remove();
